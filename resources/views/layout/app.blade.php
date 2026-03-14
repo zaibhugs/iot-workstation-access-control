@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+     <title>@yield('title')</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/flowbite@2.5.1/dist/flowbite.min.css" rel="stylesheet" />
 </head>
@@ -29,7 +29,7 @@
         </button>
         
         <!-- LOGO - Always visible in navbar -->
-       <a href="/" class="flex ms-2 md:me-24">
+       <a href="{{route('dashboard')}}" class="flex ms-2 md:me-24">
           <img src="{{ asset('image/logo_dep.png') }}" class="h-8 me-3" alt="OLH Logo" />
           <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap">OLH</span>
         </a>
@@ -84,7 +84,7 @@
             </a>
          </li>
          <li>
-            <a href="#" class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group">
+            <a href="{{route('workstation')}}" class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group">
                <svg class="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 13h3.439a.991.991 0 0 1 .908.6 3.978 3.978 0 0 0 7.306 0 .99.99 0 0 1 .908-.6H20M4 13v6a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-6M4 13l2-9h12l2 9M9 7h6m-7 3h8"/>
                </svg>
