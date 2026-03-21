@@ -28,7 +28,7 @@ An IoT-based workstation monitoring system that uses **RFID tapping** to **log i
 | Feature | Status | Description |
 |---|---|---|
 | Database Schema & Migrations | ✅ | Tables, foreign keys, indexes for devices, workstations, slots, students, snapshots, sessions, taps |
-| Admin Authentication | ✅ | Admin login and access control |
+| Admin Authentication | ⏳ | Admin login and access control |
 | Device Management | ⏳ | Register/approve/disable devices, track device status |
 | Workstation Management | ⏳ | Create workstations, link device, status control |
 | Slot Management | ⏳ | Create/manage slots per workstation (e.g., PC-A / PC-B) |
