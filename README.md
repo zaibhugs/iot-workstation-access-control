@@ -1,59 +1,117 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# IoT Workstation Access Control
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+An IoT-based workstation monitoring system that uses **RFID tapping** to **log in / log out** a user on a workstation PC. The system validates the RFID UID through a **Student API** (server-to-server) and stores usage logs in a **Laravel** backend with an **admin panel**.
 
-## About Laravel
+## Main Features
+- **Tap-to-Log In / Tap-to-Log Out** (RFID UID)
+- **Server-side UID validation** (Laravel → Student API)
+- **Workstations with slots** (example: 1 workstation = 2 PCs)
+- **Device approval** (pending / active / disabled)
+- **Session + tap logging** for utilization reports
+- **Duplicate protection** using `request_id` (UUID)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Architecture (Option 1)
+**C# Client (per PC)** → **Laravel API** → **Student API** → **MySQL**
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Basic Flow
+1. Student taps RFID card.
+2. The PC client sends to Laravel:
+   - `device_uid`, `workstation_slot_id`, `uid`, `request_id`, `tapped_at`
+3. Laravel validates the request, checks the UID with the Student API, and saves logs.
+4. The client shows login/logout status.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Roadmap & Progress
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### Phase 1 — Core System 📌 (In Progress)
+| Feature | Status | Description |
+|---|---|---|
+| Database Schema & Migrations | ✅ | Tables, foreign keys, indexes for devices, workstations, slots, students, snapshots, sessions, taps |
+| Admin Authentication | ✅ | Admin login and access control |
+| Device Management | ⏳ | Register/approve/disable devices, track device status |
+| Workstation Management | ⏳ | Create workstations, link device, status control |
+| Slot Management | ⏳ | Create/manage slots per workstation (e.g., PC-A / PC-B) |
+| Basic UI/UX | ⏳ | Admin pages for CRUD and list views |
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+### Phase 2 — Integration 📌 (Planned)
+| Feature | Status | Description |
+|---|---|---|
+| Student API Integration | 📋 | Server-to-server lookup by UID, error handling, timeouts |
+| Device Authentication | 📋 | Token-based auth (store token hash in database) |
+| Device Heartbeat (Optional) | 📋 | Update `last_seen_at`, IP logging, auto-register pending devices |
+| Environment Configuration | 📋 | `.env` settings for database + Student API configuration |
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+### Phase 3 — Core Functionality (Tap System) 📌 (Planned)
+| Feature | Status | Description |
+|---|---|---|
+| Tap Endpoint | 📋 | `POST /api/rfid/tap` validation + logging |
+| Tap Idempotency | 📋 | `request_id` unique to prevent duplicates on retries |
+| Tap-to-Login/Logout | 📋 | Toggle session per slot (tap starts/ends session) |
+| Rejection Handling | 📋 | Store rejected taps with reasons (invalid UID, device inactive, API down) |
+| Concurrency Safety | 📋 | Prevent double sessions per slot (transactions/locking) |
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+---
 
-## Contributing
+### Phase 4 — Client Application (C#) 📌 (Planned)
+| Feature | Status | Description |
+|---|---|---|
+| Client Configuration | 📋 | `api_base_url`, `device_uid`, `workstation_slot_id` |
+| Tap Submission | 📋 | Generate `request_id`, send payload, show result |
+| UI Feedback | 📋 | Login/logout status and rejection messages |
+| Retry & Timeout Handling | 📋 | Safe retries with idempotency |
+| Offline Queue (Optional) | 📋 | Store taps locally and resend when online |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+---
 
-## Code of Conduct
+### Phase 5 — Monitoring & Reporting 📌 (Planned)
+| Feature | Status | Description |
+|---|---|---|
+| Active Sessions View | 📋 | Show who is logged in and which slot is active |
+| Utilization Reports | 📋 | Daily/weekly/monthly usage per workstation/slot |
+| Tap Audit Log | 📋 | Filter/search accepted + rejected taps |
+| Export | 📋 | CSV/PDF export for sessions and taps |
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+### Phase 6 — Security & Deployment 📌 (Planned)
+| Feature | Status | Description |
+|---|---|---|
+| HTTPS Setup | 📋 | Secure API calls (LAN certificate if needed) |
+| Rate Limiting | 📋 | Protect tap endpoint per device/IP |
+| Backup Plan | 📋 | Scheduled MySQL backups + restore testing |
+| Deployment Checklist | 📋 | Device labeling, slot mapping, test cards, maintenance schedule |
+| Hardening | 📋 | Admin security, audit logs, workstation PC hardening |
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+---
+
+### Phase 7 — Future Enhancements 📋 (Planned)
+| Feature | Status | Description |
+|---|---|---|
+| Multi-site Support | 📋 | Support multiple facilities with centralized reporting |
+| Advanced Analytics | 📋 | Peak hours, trends, and usage insights |
+| Remote Device Management | 📋 | Remote status and firmware update workflow (future work) |
+| Cross-platform Client | 📋 | macOS/Linux support (new client or alternative approach) |
+| External Integrations | 📋 | SIS/HR/SSO integration (future work) |
+
+---
+
+## Quick Start (Backend - Laravel)
+```bash
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
+
+## Tap Rules (Toggle)
+- If there is **no active session** on the slot → create session (**log in**).
+- If there is an **active session** on the slot → end session (**log out**).
 
 ## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+This project is licensed under the **MIT License**. See `LICENSE` for details.
