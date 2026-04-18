@@ -10,15 +10,15 @@
     <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
         {{-- Clickable centered icon --}}
         <div class="flex justify-center mb-6">
-
+            
            <a
-                href="#"
-                class="group outline-none"
-                aria-label="Open PC 1"
-                data-modal-target="default-modal"
-                data-modal-toggle="default-modal"
-                onclick="event.preventDefault();"
-            >
+    href="#"
+    class="group outline-none"
+    aria-label="Open PC 1"
+    data-modal-target="default-modal"
+    data-modal-toggle="default-modal"
+    onclick="event.preventDefault();"
+>
     <div class="w-20 h-20 bg-neutral-primary-medium border border-default-medium rounded-full flex items-center justify-center
                 transition-colors group-hover:bg-neutral-tertiary-medium group-focus:ring-4 group-focus:ring-neutral-tertiary">
         <svg class="w-10 h-10 text-body transition-colors group-hover:text-heading" aria-hidden="true"
@@ -40,7 +40,7 @@
             </span>
         </div>
     </div>
-     {{-- CARD 2 --}}
+     {{-- CARD 1 --}}
     <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
         {{-- Clickable centered icon --}}
         <div class="flex justify-center mb-6">
@@ -66,8 +66,8 @@
             </span>
         </div>
     </div>
-
-     {{-- CARD 3 --}}
+   
+     {{-- CARD 1 --}}
     <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
         {{-- Clickable centered icon --}}
         <div class="flex justify-center mb-6">
