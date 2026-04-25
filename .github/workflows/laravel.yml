@@ -51,5 +51,5 @@ jobs:
         DB_PORT: 3306
         DB_DATABASE: testing
         DB_USERNAME: root
-        DB_PASSWORD: root
+        DB_PASSWORD:
       run: php artisan test
