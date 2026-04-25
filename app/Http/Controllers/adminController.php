@@ -12,11 +12,5 @@ class adminController extends Controller
     public function analytics(){
         return view('admin.analytics');
     }
-    public function workstation(){
-        return view('admin.workstation.index');   
-    }
-    public function workstation_view(){
-        return view('admin.workstation.show');
-    }
 }
 

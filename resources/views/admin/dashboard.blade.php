@@ -4,9 +4,98 @@
 
 @section('content')
 
+{{-- =========================
+  TOP SUMMARY CARDS (RESPONSIVE)
+  - 1 col on mobile
+  - 2 cols on small screens
+  - 4 cols on xl+ (one row like your screenshot)
+========================= --}}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+  {{-- Card 1 --}}
+  <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-4">
+    <div class="flex items-center justify-between">
+      <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+          <path d="M12 7a5 5 0 0 1 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M12 3a9 9 0 0 1 9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M12 11a1 1 0 1 1 0 2a1 1 0 0 1 0-2Z" fill="currentColor"/>
+          <path d="M5 20h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="text-right ms-3">
+        <div class="text-3xl font-semibold text-heading leading-none" id="total-devices">3</div>
+        <div class="mt-1 text-sm text-body">Total Devices</div>
+      </div>
+    </div>
+
+    <div class="mt-2 text-xs text-body" id="total-devices-sub">3 active</div>
+  </div>
+
+  {{-- Card 2 --}}
+  <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-4">
+    <div class="flex items-center justify-between">
+      <div class="w-10 h-10 rounded-xl bg-green-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+          <path d="M4 12h4l2-5 4 10 2-5h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="text-right ms-3">
+        <div class="text-3xl font-semibold text-heading leading-none" id="online-devices">0</div>
+        <div class="mt-1 text-sm text-body">Online Devices</div>
+      </div>
+    </div>
+
+    <div class="mt-2 text-xs text-body" id="online-devices-sub">3 offline</div>
+  </div>
+
+  {{-- Card 3 --}}
+  <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-4">
+    <div class="flex items-center justify-between">
+      <div class="w-10 h-10 rounded-xl bg-purple-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+          <path d="M4 5h16v10H4V5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M9 19h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M12 15v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="text-right ms-3">
+        <div class="text-3xl font-semibold text-heading leading-none" id="total-workstations-top">3</div>
+        <div class="mt-1 text-sm text-body">Total WorkStations</div>
+      </div>
+    </div>
+
+    <div class="mt-2 text-xs text-body" id="total-workstations-sub">3 active</div>
+  </div>
+
+  {{-- Card 4 --}}
+  <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-4">
+    <div class="flex items-center justify-between">
+      <div class="w-10 h-10 rounded-xl bg-orange-600 flex items-center justify-center shrink-0">
+        <svg class="w-5 h-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+          <path d="M12 9v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M12 17h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <path d="M10 3h4l7 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V10l7-7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <div class="text-right ms-3">
+        <div class="text-3xl font-semibold text-heading leading-none" id="slot-utilization">50%</div>
+        <div class="mt-1 text-sm text-body">Slot Utilization</div>
+      </div>
+    </div>
+
+    <div class="mt-2 text-xs text-body">Overall capacity</div>
+  </div>
+</div>
+
+{{-- =========================
+  CHARTS (YOUR ORIGINAL CODE)
+========================= --}}
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
- 
-  <!-- First Widget - Library Workstation Usage -->
+  
   <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
     <div class="flex justify-between items-start pb-4 mb-4 border-b border-light">
       <div class="flex items-center">
@@ -14,21 +103,21 @@
           <svg class="w-6 h-6 text-body" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/></svg>
         </div>
         <div>
-          <h5 class="text-3xl font-bold text-heading">1,248</h5>
+          <h5 class="text-3xl font-bold text-heading" id="total-usage">0</h5>
           <p class="text-sm text-body">Library Workstation Usage</p>
         </div>
       </div>
       <div>
         <span class="inline-flex items-center bg-success-soft border border-success-subtle text-fg-success-strong text-sm font-medium px-2 py-1 rounded">
           <svg class="w-4 h-4 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v13m0-13 4 4m-4-4-4 4"/></svg>
-         12.5%
+          <span id="usage-percentage">0%</span>
         </span>
       </div>
     </div>
 
     <div class="flex justify-between items-center mb-4">
       <span class="text-body text-sm font-normal">Weekly Total Visitors</span>
-      <span class="text-heading text-lg font-semibold">2,500</span>
+      <span class="text-heading text-lg font-semibold" id="weekly-visitors">0</span>
     </div>
     
     <div id="column-chart" class="mb-4"></div>
@@ -54,7 +143,6 @@
     </div>
   </div>
 
-  <!-- Second Widget - Courses -->
   <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
     <div class="flex justify-between items-start pb-4 mb-4 border-b border-light">
       <div>
@@ -64,9 +152,9 @@
           <div data-popover id="traffic-info" role="tooltip" class="absolute z-10 p-3 invisible inline-block text-sm text-body transition-opacity duration-300 bg-neutral-primary-soft border border-default rounded-base shadow-xs opacity-0 w-72">
             <div>
               <h3 class="font-semibold text-heading mb-2">Course Distribution</h3>
-              <p class="mb-4">This chart shows the distribution of students across different courses in the library system.</p>
+              <p class="mb-4">This chart shows the distribution of students across different courses.</p>
               <a href="#" class="flex items-center font-medium text-fg-brand hover:underline">
-                Read more 
+                Read more
                 <svg class="w-4 h-4 ms-1 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m14 0-4 4m4-4-4-4"/></svg>
               </a>
             </div>
@@ -74,16 +162,13 @@
           </div>
         </div>
       </div>
-     
-     
     </div>
 
     <div class="flex justify-between items-center mb-4">
       <span class="text-body text-sm font-normal">Total Students</span>
-      <span class="text-heading text-lg font-semibold">3,847</span>
+      <span class="text-heading text-lg font-semibold" id="total-students">0</span>
     </div>
 
-    <!-- Pie Chart -->
     <div id="pie-chart" class="mb-4"></div>
 
     <div class="flex justify-between items-center pt-4 border-t border-light">
@@ -111,60 +196,34 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  
-  // ==========================================
-  // COLUMN CHART (First Widget)
-  // ==========================================
-  const getBrandColor = () => {
-    const computedStyle = getComputedStyle(document.documentElement);
-    return computedStyle.getPropertyValue('--color-fg-brand').trim() || "#1447E6";
-  };
 
-  const getBrandSecondaryColor = () => {
-    const computedStyle = getComputedStyle(document.documentElement);
-    return computedStyle.getPropertyValue('--color-fg-brand-subtle').trim() || "#93C5FD";
-  };
+  // ==========================================
+  // HELPERS
+  // ==========================================
+  const getBrandColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-fg-brand').trim() || "#1447E6";
+  const getBrandSecondaryColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-fg-brand-subtle').trim() || "#93C5FD";
+  const getBrandTertiaryColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-fg-brand-strong').trim() || "#1E40AF";
+  const getNeutralPrimaryColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-neutral-primary').trim() || "#FFFFFF";
 
   const brandColor = getBrandColor();
   const brandSecondaryColor = getBrandSecondaryColor();
+  const brandTertiaryColor = getBrandTertiaryColor();
+  const neutralPrimaryColor = getNeutralPrimaryColor();
 
+  // ==========================================
+  // COLUMN CHART (First Widget)
+  // ==========================================
   const columnChartOptions = {
     colors: [brandColor, brandSecondaryColor],
     series: [
-      {
-        name: "Male",
-        color: brandColor,
-        data: [
-          { x: "Mon", y: 231 },
-          { x: "Tue", y: 122 },
-          { x: "Wed", y: 63 },
-          { x: "Thu", y: 421 },
-          { x: "Fri", y: 122 },
-          { x: "Sat", y: 323 },
-          { x: "Sun", y: 111 },
-        ],
-      },
-      {
-        name: "Female",
-        color: brandSecondaryColor,
-        data: [
-          { x: "Mon", y: 232 },
-          { x: "Tue", y: 113 },
-          { x: "Wed", y: 341 },
-          { x: "Thu", y: 224 },
-          { x: "Fri", y: 522 },
-          { x: "Sat", y: 411 },
-          { x: "Sun", y: 243 },
-        ],
-      },
+      { name: "Male", data: [] },
+      { name: "Female", data: [] },
     ],
     chart: {
       type: "bar",
       height: "280px",
       fontFamily: "Inter, sans-serif",
-      toolbar: {
-        show: false,
-      },
+      toolbar: { show: false },
     },
     plotOptions: {
       bar: {
@@ -177,63 +236,26 @@ document.addEventListener('DOMContentLoaded', function() {
     tooltip: {
       shared: true,
       intersect: false,
-      style: {
-        fontFamily: "Inter, sans-serif",
-      },
+      style: { fontFamily: "Inter, sans-serif" },
     },
-    states: {
-      hover: {
-        filter: {
-          type: "darken",
-          value: 1,
-        },
-      },
-    },
-    stroke: {
-      show: true,
-      width: 0,
-      colors: ["transparent"],
-    },
-    grid: {
-      show: false,
-      strokeDashArray: 4,
-      padding: {
-        left: 2,
-        right: 2,
-        top: -14
-      },
-    },
-    dataLabels: {
-      enabled: false,
-    },
-    legend: {
-      show: false,
-    },
+    states: { hover: { filter: { type: "darken", value: 1 } } },
+    stroke: { show: true, width: 0, colors: ["transparent"] },
+    grid: { show: false, padding: { left: 2, right: 2, top: -14 } },
+    dataLabels: { enabled: false },
+    legend: { show: false },
     xaxis: {
-      floating: false,
       labels: {
         show: true,
-        style: {
-          fontFamily: "Inter, sans-serif",
-          cssClass: 'text-xs font-normal fill-body'
-        }
+        style: { fontFamily: "Inter, sans-serif", cssClass: 'text-xs font-normal fill-body' }
       },
-      axisBorder: {
-        show: false,
-      },
-      axisTicks: {
-        show: false,
-      },
+      axisBorder: { show: false },
+      axisTicks: { show: false },
     },
-    yaxis: {
-      show: false,
-    },
-    fill: {
-      opacity: 1,
-    },
+    yaxis: { show: false },
+    fill: { opacity: 1 },
   };
 
-  if(document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
+  if (document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
     const columnChart = new ApexCharts(document.getElementById("column-chart"), columnChartOptions);
     columnChart.render();
   }
@@ -241,72 +263,20 @@ document.addEventListener('DOMContentLoaded', function() {
   // ==========================================
   // PIE CHART (Second Widget)
   // ==========================================
-  const getBrandTertiaryColor = () => {
-    const computedStyle = getComputedStyle(document.documentElement);
-    return computedStyle.getPropertyValue('--color-fg-brand-strong').trim() || "#1E40AF";
-  };
-
-  const getNeutralPrimaryColor = () => {
-    const computedStyle = getComputedStyle(document.documentElement);
-    return computedStyle.getPropertyValue('--color-neutral-primary').trim() || "#FFFFFF";
-  };
-
-  const brandTertiaryColor = getBrandTertiaryColor();
-  const neutralPrimaryColor = getNeutralPrimaryColor();
-
   const pieChartOptions = {
-    series: [52.8, 26.8, 20.4],
+    series: [],
     colors: [brandColor, brandSecondaryColor, brandTertiaryColor],
-    chart: {
-      height: 280,
-      width: "100%",
-      type: "pie",
-    },
-    stroke: {
-      colors: [neutralPrimaryColor],
-      lineCap: "",
-    },
-    plotOptions: {
-      pie: {
-        labels: {
-          show: true,
-        },
-        size: "100%",
-        dataLabels: {
-          offset: -25
-        }
-      },
-    },
-    labels: ["BSIT", "BIT", "FHTM"],
-    dataLabels: {
-      enabled: true,
-      style: {
-        fontFamily: "Inter, sans-serif",
-      },
-    },
-    legend: {
-      position: "bottom",
-      fontFamily: "Inter, sans-serif",
-    },
-    yaxis: {
-      labels: {
-        formatter: function (value) {
-          return value + "%"
-        },
-      },
-    },
+    chart: { height: 280, width: "100%", type: "pie" },
+    stroke: { colors: [neutralPrimaryColor], lineCap: "" },
+    plotOptions: { pie: { labels: { show: true }, size: "100%", dataLabels: { offset: -25 } } },
+    labels: [],
+    dataLabels: { enabled: true, style: { fontFamily: "Inter, sans-serif" } },
+    legend: { position: "bottom", fontFamily: "Inter, sans-serif" },
+    yaxis: { labels: { formatter: (value) => value + "%" } },
     xaxis: {
-      labels: {
-        formatter: function (value) {
-          return value  + "%"
-        },
-      },
-      axisTicks: {
-        show: false,
-      },
-      axisBorder: {
-        show: false,
-      },
+      labels: { formatter: (value) => value + "%" },
+      axisTicks: { show: false },
+      axisBorder: { show: false },
     },
   };
 
