@@ -31,7 +31,7 @@
                 <div class="flex h-64 w-64 items-center justify-center rounded-[40px] bg-blue-100">
                     <svg class="h-28 w-28 text-blue-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M12 18a1 1 0 0 1-1-1m2 0a1 1 0 0 1-1 1m1-3a4 4 0 1 0-4-4m8 0a4 4 0 1 0-4 4m0 0v2"/>
+                            d="M12 18a1 1 0 0 1-1-1m2 0a1 1 0 0 1-1 1m1-3a4 4 0 1 0-4-4m8 0a4 4 0 1 0-4 4m0 0v2"/>
                     </svg>
                 </div>
 
@@ -71,10 +71,8 @@
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div class="p-10">
             <h2 class="text-4xl font-semibold text-gray-900">Add Device</h2>
-
             <form method="POST" action="" class="mt-10 space-y-8">
                 @csrf
-
                 {{-- Device Code --}}
                 <div>
                     <label for="device_code" class="mb-2 block text-base font-medium text-gray-900">
