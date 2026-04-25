@@ -2,9 +2,9 @@ name: Laravel
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   laravel-tests:
@@ -19,37 +19,38 @@ jobs:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: testing
         options: >-
-          --health-cmd="mysqladmin ping"
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=10
+
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: testing
+      DB_USERNAME: root
+      DB_PASSWORD: root
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.4'
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
 
-    - name: Install Dependencies
-      run: composer install --no-interaction --prefer-dist
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist
 
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+      - name: Copy .env
+        run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-    - name: Generate key
-      run: php artisan key:generate
+      - name: Generate key
+        run: php artisan key:generate
 
-    - name: Run migrations
-      run: php artisan migrate --force
+      - name: Run migrations
+        run: php artisan migrate --force
 
-    - name: Execute tests
-      env:
-        DB_CONNECTION: mysql
-        DB_HOST: 127.0.0.1
-        DB_PORT: 3306
-        DB_DATABASE: testing
-        DB_USERNAME: root
-        DB_PASSWORD:
-      run: php artisan test
+      - name: Execute tests
+        run: php artisan test
