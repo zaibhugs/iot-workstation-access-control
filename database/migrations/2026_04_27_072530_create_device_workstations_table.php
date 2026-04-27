@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('device_id')
                 ->constrained('devices')
                 ->cascadeOnDelete();
-            $table->tinyInteger('pc_port'); // 1 or 2 (device "channel" for PC)
+            $table->unsignedTinyInteger('pc_port'); // 1 or 2 (device "channel" for PC)
             $table->foreignId('workstation_id')
                 ->constrained('workstations')
                 ->cascadeOnDelete();

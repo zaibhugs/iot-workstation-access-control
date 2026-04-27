@@ -33,6 +33,6 @@ class PcAccessLog extends Model
 
     public function workstation(): BelongsTo
     {
-        return $this->belongsTo(workstation::class);
+        return $this->belongsTo(Workstation::class);
     }
 }

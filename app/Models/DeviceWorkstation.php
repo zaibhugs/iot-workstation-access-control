@@ -19,11 +19,11 @@ class DeviceWorkstation extends Model
 
     public function device(): BelongsTo
     {
-        return $this->belongsTo(device::class);
+        return $this->belongsTo(Device::class);
     }
 
     public function workstation(): BelongsTo
     {
-        return $this->belongsTo(workstation::class);
+        return $this->belongsTo(Workstation::class);
     }
 }

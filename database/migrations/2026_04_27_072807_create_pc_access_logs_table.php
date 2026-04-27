@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('received_at')->useCurrent();
             // Source identifiers
             $table->string('device_uid', 100);
-            $table->tinyInteger('pc_port'); // 1 or 2
+            $table->unsignedTinyInteger('pc_port'); // 1 or 2
             $table->string('rfid_uid', 100);
             // Resolved workstation (via device_workstations mapping)
             $table->foreignId('workstation_id')

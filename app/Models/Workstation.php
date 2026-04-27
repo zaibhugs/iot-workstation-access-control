@@ -23,10 +23,10 @@ class Workstation extends Model
      */
     public function deviceMapping(): HasOne
     {
-        return $this->hasOne(device_workstation::class);
+        return $this->hasOne(DeviceWorkstation::class);
     }
     public function accessLogs(): HasMany
     {
-        return $this->hasMany(pc_access_log::class);
+        return $this->hasMany(PcAccessLog::class);
     }
 }
