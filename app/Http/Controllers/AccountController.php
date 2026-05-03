@@ -49,12 +49,16 @@ class AccountController extends Controller
 
         return redirect()->back();
     }
-    public function destroy()
+    public function destroy(Request $request)
     {
         $user = Auth::user();
+        if ($user->profile_pic) {
+            Storage::disk('public')->delete($user->profile_pic);
+        }
         Auth::logout();
         $user->delete();
-
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
         return redirect('/');
     }
 }
