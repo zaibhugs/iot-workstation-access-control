@@ -4,6 +4,7 @@ use App\Http\Controllers\adminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\WorkstationController;
+use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -26,4 +27,8 @@ Route::middleware('auth')->group(function () {
     // Device Route
     Route::get('/device',[DeviceController::class,'index'])->name('device');
     Route::get('/device/add',[DeviceController::class,'create'])->name('device.create');
+    // Account Route
+    Route::get('/account',[AccountController::class,'index'])->name('account');
+    Route::put('/account/update',[AccountController::class,'update'])->name('account.update');
+    Route::delete('/account/delete',[AccountController::class,'destroy'])->name('account.delete');
 });
