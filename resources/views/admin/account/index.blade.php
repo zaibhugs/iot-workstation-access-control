@@ -4,7 +4,7 @@
 
 @section('content')
 
-{{-- 
+{{--
     IMPORTANT: The form wraps the entire grid.
     enctype="multipart/form-data" is required for file uploads.
 --}}
@@ -16,15 +16,15 @@
         {{-- Left Column: Profile Picture --}}
         <div class="lg:col-span-1">
             <div class="bg-white rounded-lg shadow-xs p-6 border border-gray-200 sticky top-20">
-                
+
                 {{-- Profile Picture Upload Area --}}
                 <div class="mb-6">
                     <label for="profile_image" class="relative w-full aspect-square bg-neutral-primary-medium border-2 border-dashed border-default rounded-lg flex items-center justify-center overflow-hidden group cursor-pointer hover:bg-neutral-secondary-medium transition">
-                        
+
                         {{-- UPDATED: Changed from profile_picture to profile_pic --}}
-                        <img id="image_preview" 
-                             src="{{ $user->profile_pic ? asset('storage/' . $user->profile_pic) : '' }}" 
-                             class="absolute inset-0 w-full h-full object-cover {{ $user->profile_pic ? '' : 'hidden' }}">
+                        <img id="image_preview"
+                            src="{{ $user->profile_pic ? asset('storage/' . $user->profile_pic) : '' }}"
+                            class="absolute inset-0 w-full h-full object-cover {{ $user->profile_pic ? '' : 'hidden' }}">
 
                         {{-- UPDATED: Placeholder hidden if profile_pic exists --}}
                         <div id="upload_placeholder" class="text-center {{ $user->profile_pic ? 'hidden' : '' }}">
@@ -56,7 +56,7 @@
                 {{-- Quick Action Buttons --}}
                 <div class="mt-4 space-y-2">
                     {{-- This button triggers the separate form below --}}
-                    <button type="button" 
+                    <button type="button"
                             onclick="confirmDelete()"
                             class="w-full text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 rounded-base px-4 py-2.5 transition">
                         Delete Account
@@ -151,7 +151,7 @@
             {{ $errors->first('password') }}
         </p>
         <div class="mt-6">
-            <button onclick="document.getElementById('error-modal').remove()" 
+            <button onclick="document.getElementById('error-modal').remove()"
                     class="w-full px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-base hover:bg-blue-700 transition">
                 Try Again
             </button>
@@ -177,7 +177,7 @@
                 placeholder.classList.add('hidden');
             }
         }
-        
+
         if (event.target.files[0]) {
             reader.readAsDataURL(event.target.files[0]);
         }
