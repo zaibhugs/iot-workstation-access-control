@@ -54,7 +54,7 @@
             <ul class="py-1" role="none">
                 <li><a href="{{route('dashboard')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Dashboard</a></li>
                 <li><a href="{{route('account')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Manage Account</a></li>
-                <li><a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a></li>
+                <li><a href="{{route('logout')}}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Sign out</a></li>
             </ul>
             </div>
         </div>
@@ -112,21 +112,6 @@
             </svg>
             <span class="flex-1 ms-3 whitespace-nowrap">Reports</span>
         </a>
-        </li>
-        <li>
-            <a href="{{ route('logout') }}"
-        class="flex items-center px-2 py-1.5 text-body rounded-base hover:bg-neutral-tertiary hover:text-fg-brand group"
-        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-        <svg class="shrink-0 w-5 h-5 transition duration-75 group-hover:text-fg-brand" aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"/>
-        </svg>
-        <span class="flex-1 ms-3 whitespace-nowrap">Sign Out</span>
-        </a>
-<form id="logout-form" action="{{ route('logout') }}" method="POST" class="hidden">
-    @csrf
-</form>
         </li>
     </ul>
 </div>

@@ -12,7 +12,7 @@ Route::get('/login',[AuthController::class,'index']);
 Route::post('/login',[AuthController::class,'login'])->name('login');
 Route::get('/register',[AuthController::class,'create'])->name('register');
 Route::post('/register',[AuthController::class,'store'])->name('register.store');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/', function () {
     return redirect('/login');
 });
