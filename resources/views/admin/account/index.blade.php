@@ -23,11 +23,11 @@
 
                         {{-- UPDATED: Changed from profile_picture to profile_pic --}}
                         <img id="image_preview"
-                            src="{{ $user->profile_pic ? asset('storage/' . $user->profile_pic) : '' }}"
-                            class="absolute inset-0 w-full h-full object-cover {{ $user->profile_pic ? '' : 'hidden' }}">
+                            src="{{ $user->profile_picture ? asset('storage/' . $user->profile_picture) : '' }}"
+                            class="absolute inset-0 w-full h-full object-cover {{ $user->profile_picture ? '' : 'hidden' }}">
 
-                        {{-- UPDATED: Placeholder hidden if profile_pic exists --}}
-                        <div id="upload_placeholder" class="text-center {{ $user->profile_pic ? 'hidden' : '' }}">
+                        {{-- UPDATED: Placeholder hidden if profile_picture exists --}}
+                        <div id="upload_placeholder" class="text-center {{ $user->profile_picture ? 'hidden' : '' }}">
                             <svg class="w-16 h-16 text-body mx-auto mb-2 group-hover:text-heading transition" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM3 20a6 6 0 0 1 12 0v1H3v-1z"/>
                             </svg>
