@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\DeviceWorkstation;
+use App\Models\PcAccessLogs;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class Workstation extends Model
+class Workstations extends Model
 {
     protected $fillable = [
         'pc_code',
@@ -14,19 +14,13 @@ class Workstation extends Model
         'is_active',
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
-    /**
-     * Because we enforce unique(workstation_id) in device_workstations,
-     * one workstation is mapped to only one device (but via a port).
-     */
-    public function deviceMapping(): HasOne
+    public function deviceWorkstations()
     {
-        return $this->hasOne(device_workstation::class);
+        return $this->hasMany(DeviceWorkstation::class);
     }
-    public function accessLogs(): HasMany
+
+    public function pcAccessLogs()
     {
-        return $this->hasMany(pc_access_log::class);
+        return $this->hasMany(PcAccessLogs::class);
     }
 }

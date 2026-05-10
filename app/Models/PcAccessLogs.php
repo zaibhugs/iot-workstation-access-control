@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Workstations;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class PcAccessLog extends Model
+class PcAccessLogs extends Model
 {
     protected $fillable = [
         'occurred_at',
@@ -21,18 +21,11 @@ class PcAccessLog extends Model
         'student_external_id',
         'student_name',
         'course',
-        'metadata',
+        'metadata'
     ];
 
-    protected $casts = [
-        'occurred_at' => 'datetime',
-        'received_at' => 'datetime',
-        'pc_port' => 'integer',
-        'metadata' => 'array',
-    ];
-
-    public function workstation(): BelongsTo
+    public function workstation()
     {
-        return $this->belongsTo(workstation::class);
+        return $this->belongsTo(Workstations::class);
     }
 }
