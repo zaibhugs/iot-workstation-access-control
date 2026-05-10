@@ -37,12 +37,12 @@ class AccountController extends Controller
         }
 
         if ($request->hasFile('profile_picture')) {
-            if ($user->profile_pic) { 
-                Storage::disk('public')->delete($user->profile_pic);
+            if ($user->profile_picture) { 
+                Storage::disk('public')->delete($user->profile_picture);
             }
 
             $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $user->profile_pic = $path; 
+            $user->profile_picture = $path; 
         }
 
         $user->save();
@@ -52,8 +52,8 @@ class AccountController extends Controller
     public function destroy(Request $request)
     {
         $user = Auth::user();
-        if ($user->profile_pic) {
-            Storage::disk('public')->delete($user->profile_pic);
+        if ($user->profile_picture) {
+            Storage::disk('public')->delete($user->profile_picture);
         }
         Auth::logout();
         $user->delete();
