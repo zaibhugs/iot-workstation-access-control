@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Devices;
+use App\Models\Device;
 use App\Models\PcAccessLogs;
 use App\Models\Workstations;
 use Illuminate\Http\Request;
@@ -13,9 +13,9 @@ class adminController extends Controller
     public function dashboard()
     {
         // Device stats
-        $totalDevices = Devices::count();
-        $activeDevices = Devices::where('is_active', 1)->count();
-        $onlineDevices = Devices::where('last_seen_at', '>=', now()->subMinutes(5))->count();
+        $totalDevices = Device::count();
+        $activeDevices = Device::where('is_active', 1)->count();
+        $onlineDevices = Device::where('last_seen_at', '>=', now()->subMinutes(5))->count();
 
         // Workstation stats
         $totalWorkstations = Workstations::count();

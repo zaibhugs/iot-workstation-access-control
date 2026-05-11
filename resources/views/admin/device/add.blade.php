@@ -4,7 +4,7 @@
 
 @section('content')
 @php
-    // Same sizing approach you used in your Workstation page UI
+    // Maintain sizing consistency
     $controlHeight = 'h-[52px]';
 @endphp
 
@@ -31,7 +31,7 @@
                 <div class="flex h-64 w-64 items-center justify-center rounded-[40px] bg-blue-100">
                     <svg class="h-28 w-28 text-blue-800" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 18a1 1 0 0 1-1-1m2 0a1 1 0 0 1-1 1m1-3a4 4 0 1 0-4-4m8 0a4 4 0 1 0-4 4m0 0v2"/>
+                              d="M12 18a1 1 0 0 1-1-1m2 0a1 1 0 0 1-1 1m1-3a4 4 0 1 0-4-4m8 0a4 4 0 1 0-4 4m0 0v2"/>
                     </svg>
                 </div>
 
@@ -71,22 +71,26 @@
     <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
         <div class="p-10">
             <h2 class="text-4xl font-semibold text-gray-900">Add Device</h2>
-            <form method="POST" action="" class="mt-10 space-y-8">
+            <form method="POST" action="{{ route('device.store') }}" class="mt-10 space-y-8">
                 @csrf
+
                 {{-- Device Code --}}
                 <div>
-                    <label for="device_code" class="mb-2 block text-base font-medium text-gray-900">
+                    <label for="device_uid" class="mb-2 block text-base font-medium text-gray-900">
                         Device Code <span class="text-red-600">*</span>
                     </label>
                     <input
                         type="text"
-                        id="device_code"
-                        name="device_code"
-                        value="{{ old('device_code') }}"
+                        id="device_uid"
+                        name="device_uid"
+                        value="{{ old('device_uid') }}"
                         placeholder="12345"
                         class="block w-full {{ $controlHeight }} rounded-xl border border-gray-200 bg-white px-4 text-base text-gray-900 shadow-sm focus:border-blue-600 focus:ring-blue-600"
                         required
                     />
+                    @error('device_uid')
+                        <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                    @enderror
                     <p class="mt-2 text-sm text-gray-500">
                         Unique code printed/stored on the ESP.
                     </p>
@@ -94,51 +98,38 @@
 
                 {{-- Device Name --}}
                 <div>
-                    <label for="device_name" class="mb-2 block text-base font-medium text-gray-900">
+                    <label for="name" class="mb-2 block text-base font-medium text-gray-900">
                         Device Name
                     </label>
                     <input
                         type="text"
-                        id="device_name"
-                        name="device_name"
-                        value="{{ old('device_name') }}"
+                        id="name"
+                        name="name"
+                        value="{{ old('name') }}"
                         placeholder="Main Door ESP"
                         class="block w-full {{ $controlHeight }} rounded-xl border border-gray-200 bg-white px-4 text-base text-gray-900 shadow-sm focus:border-blue-600 focus:ring-blue-600"
                     />
+                    @error('name')
+                        <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                    @enderror
                 </div>
 
-                {{-- Max Slots --}}
+                {{-- Status (dropdown as boolean) --}}
                 <div>
-                    <label for="max_slots" class="mb-2 block text-base font-medium text-gray-900">
-                        Max Slots <span class="text-red-600">*</span>
-                    </label>
-                    <input
-                        type="number"
-                        id="max_slots"
-                        name="max_slots"
-                        value="{{ old('max_slots', 2) }}"
-                        min="1"
-                        class="block w-full {{ $controlHeight }} rounded-xl border border-gray-200 bg-white px-4 text-base text-gray-900 shadow-sm focus:border-blue-600 focus:ring-blue-600"
-                        required
-                    />
-                    <p class="mt-2 text-sm text-gray-500">
-                        Maximum number of workstations that can be assigned to this device.
-                    </p>
-                </div>
-
-                {{-- Status (dropdown) --}}
-                <div>
-                    <label for="status" class="mb-2 block text-base font-medium text-gray-900">
+                    <label for="is_active" class="mb-2 block text-base font-medium text-gray-900">
                         Status
                     </label>
                     <select
-                        id="status"
-                        name="status"
+                        id="is_active"
+                        name="is_active"
                         class="block w-full {{ $controlHeight }} rounded-xl border border-gray-200 bg-white px-4 pr-10 text-base text-gray-900 shadow-sm focus:border-blue-600 focus:ring-blue-600"
                     >
-                        <option value="Active" @selected(old('status', 'Active') === 'Active')>Active</option>
-                        <option value="Inactive" @selected(old('status') === 'Inactive')>Inactive</option>
+                        <option value="1" @selected(old('is_active', '1') == '1')>Active</option>
+                        <option value="0" @selected(old('is_active') == '0')>Inactive</option>
                     </select>
+                    @error('is_active')
+                        <div class="text-red-500 text-sm mt-1">{{ $message }}</div>
+                    @enderror
                 </div>
 
                 {{-- Last Seen (disabled display field) --}}
