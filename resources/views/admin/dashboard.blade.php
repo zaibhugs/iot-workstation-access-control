@@ -195,15 +195,18 @@ TOP SUMMARY CARDS (RESPONSIVE)
         </div>
     </div>
     </div>
-
+@php
+    $sortedCourses = collect($courseDistribution)->sortDesc();
+    $pieChartCourses = $sortedCourses->take(max(3, min($sortedCourses->count(), 5)));
+@endphp
     <script>
     document.addEventListener('DOMContentLoaded', function() {
     // Laravel data: dynamic and from the database, including when only one visitor is available
     const maleData = @json($male);
     const femaleData = @json($female);
     const columnChartDays = @json($columnChartDays);
-    const courseLabels = @json(array_keys($courseDistribution));
-    const courseCounts = @json(array_values($courseDistribution));
+    const courseLabels = @json($pieChartCourses->keys()->all());
+    const courseCounts = @json($pieChartCourses->values()->all());
 
     // COLUMN CHART
     const getBrandColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-fg-brand').trim() || "#1447E6";
@@ -267,7 +270,7 @@ TOP SUMMARY CARDS (RESPONSIVE)
         plotOptions: { pie: { labels: { show: true }, size: "100%", dataLabels: { offset: -25 } } },
         labels: courseLabels,
         dataLabels: { enabled: true, style: { fontFamily: "Inter, sans-serif" } },
-        legend: { position: "bottom", fontFamily: "Inter, sans-serif" },
+        legend: { show: false },
         yaxis: { labels: { formatter: function (value) { return value + "%" } } },
         xaxis: { labels: { formatter: function (value) { return value  + "%" } }, axisTicks: { show: false }, axisBorder: { show: false } }
     };
