@@ -20,6 +20,7 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard',[adminController::class,'dashboard'])->name('dashboard');
     Route::get('/analytics',[adminController::class,'analytics'])->name('analytics');
+    Route::get('/reports',[adminController::class,'reports'])->name('reports');
     // Workstation  Routes
     Route::get('/workstation',[WorkstationController::class,'index'])->name('workstation');
     Route::get('/workstation/add',[WorkstationController::class,'create'])->name('workstation.create');
