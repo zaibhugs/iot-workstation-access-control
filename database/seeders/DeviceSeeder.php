@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\Devices;
+use App\Models\Device;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 class DeviceSeeder extends Seeder
 {
@@ -13,15 +14,13 @@ class DeviceSeeder extends Seeder
      */
     public function run()
     {
-        Devices::create([
-            'device_uid' => 'DVC001',
-            'is_active' => 1,
-            'last_seen_at' => now(),
-        ]);
-        Devices::create([
-            'device_uid' => 'DVC002',
-            'is_active' => 1,
-            'last_seen_at' => now(),
-        ]);
+        for ($i = 1; $i <= 10; $i++) {
+            Device::create([
+                'device_uid'    => 'DVC' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                'is_active'     => $i % 2, // alternate
+                // Generate a random date in last 30 days
+                'last_seen_at'  => Carbon::now()->subDays(rand(0, 29))->subMinutes(rand(0, 1439)),
+            ]);
+        }
     }
 }

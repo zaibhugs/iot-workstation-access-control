@@ -29,7 +29,7 @@ class DeviceController extends Controller
 
         //Fetch the data with pagination
 
-        $devices = $query->latest()->paginate(10)->withQueryString();
+        $devices = $query->latest()->paginate(5)->withQueryString();
 
         // 5. Return the view with the data
         return view('admin.device.index', compact('devices'));

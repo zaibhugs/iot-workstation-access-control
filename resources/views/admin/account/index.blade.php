@@ -123,7 +123,9 @@
 
             {{-- Action Buttons --}}
             <div class="flex gap-3 sticky bottom-0 bg-white pt-4 pb-6 border-t border-gray-200">
-                <button type="button" class="flex-1 text-heading bg-neutral-primary-soft border border-default hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary rounded-base px-4 py-2.5 font-medium text-sm transition">
+                <button type="button"
+                        class="flex-1 text-heading bg-neutral-primary-soft border border-default hover:bg-neutral-secondary-medium focus:ring-4 focus:ring-neutral-tertiary rounded-base px-4 py-2.5 font-medium text-sm transition"
+                        onclick="goBack()">
                     Cancel
                 </button>
                 <button type="submit" class="flex-1 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 rounded-base px-4 py-2.5 font-medium text-sm transition">
@@ -160,6 +162,9 @@
 </div>
 @endif
 <script>
+    function goBack() {
+    window.history.back();
+    }
     function confirmDelete() {
         if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
             document.getElementById('delete-account-form').submit();
