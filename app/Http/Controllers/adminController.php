@@ -8,7 +8,7 @@ use App\Models\Workstations;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
-class adminController extends Controller
+class AdminController extends Controller
 {
     public function dashboard()
     {

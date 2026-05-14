@@ -11,6 +11,7 @@
 <form action="{{ route('account.update') }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
+    <input type="hidden" name="verification_code" id="verification_code">
 
     <div class="w-full grid grid-cols-1 lg:grid-cols-3 gap-6">
         {{-- Left Column: Profile Picture --}}
@@ -128,7 +129,7 @@
                         onclick="goBack()">
                     Cancel
                 </button>
-                <button type="submit" class="flex-1 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 rounded-base px-4 py-2.5 font-medium text-sm transition">
+                <button id="save-changes-button" type="submit" class="flex-1 text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 rounded-base px-4 py-2.5 font-medium text-sm transition">
                     Save Changes
                 </button>
             </div>
@@ -139,8 +140,26 @@
     @csrf
     @method('DELETE')
 </form>
-{{-- Validation Error Modal --}}
-@if($errors->has('password'))
+<div id="verification-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 px-4">
+    <div class="w-full max-w-md rounded-lg border border-gray-200 bg-white p-6 shadow-xl">
+        <div class="mb-4">
+            <p class="text-xs font-semibold uppercase tracking-wide text-body">Verification Required</p>
+            <h3 class="mt-2 text-lg font-bold text-heading">Enter the 6-digit code</h3>
+            <p class="mt-2 text-sm text-body">We sent a code to your email. Enter it here to finish saving your password change.</p>
+        </div>
+
+        <div id="send-code-feedback" class="mb-4 hidden rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"></div>
+
+        <label for="verification_code_input" class="mb-2 block text-sm font-medium text-heading">Verification Code</label>
+        <input id="verification_code_input" type="text" inputmode="numeric" maxlength="6" class="bg-neutral-secondary-medium border border-default-medium text-heading text-sm rounded-base focus:ring-2 focus:ring-brand focus:border-brand block w-full px-3 py-2.5 shadow-xs placeholder:text-body" placeholder="123456">
+
+        <div class="mt-6 flex gap-3">
+            <button type="button" id="close-verification-modal" class="flex-1 rounded-base border border-default px-4 py-2.5 text-sm font-medium text-heading hover:bg-neutral-secondary-medium transition">Cancel</button>
+            <button type="button" id="confirm-save-button" class="flex-1 rounded-base bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition">Confirm &amp; Save</button>
+        </div>
+    </div>
+</div>
+@if($errors->has('password') || $errors->has('verification_code'))
 <div id="error-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
     <div class="bg-white rounded-lg shadow-xl max-w-sm w-full p-6 border border-gray-200">
         <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-red-100 rounded-full">
@@ -150,7 +169,7 @@
         </div>
         <h3 class="text-lg font-bold text-center text-heading">Security Error</h3>
         <p class="mt-2 text-sm text-center text-body">
-            {{ $errors->first('password') }}
+            {{ $errors->first('verification_code') ?: $errors->first('password') }}
         </p>
         <div class="mt-6">
             <button onclick="document.getElementById('error-modal').remove()"
@@ -162,14 +181,27 @@
 </div>
 @endif
 <script>
+    const accountForm = document.querySelector('form[action="{{ route('account.update') }}"]');
+    const saveButton = document.getElementById('save-changes-button');
+    const passwordInput = document.getElementById('new_password');
+    const verificationModal = document.getElementById('verification-modal');
+    const verificationInput = document.getElementById('verification_code_input');
+    const verificationHiddenInput = document.getElementById('verification_code');
+    const confirmSaveButton = document.getElementById('confirm-save-button');
+    const closeVerificationModal = document.getElementById('close-verification-modal');
+    const sendCodeFeedback = document.getElementById('send-code-feedback');
+    let bypassVerification = false;
+
     function goBack() {
-    window.history.back();
+        window.history.back();
     }
+
     function confirmDelete() {
         if (confirm('Are you sure you want to delete your account? This cannot be undone.')) {
             document.getElementById('delete-account-form').submit();
         }
     }
+
     function previewImage(event) {
         const reader = new FileReader();
         const preview = document.getElementById('image_preview');
@@ -187,6 +219,90 @@
             reader.readAsDataURL(event.target.files[0]);
         }
     }
+
+    function openVerificationModal() {
+        sendCodeFeedback.classList.add('hidden');
+        sendCodeFeedback.textContent = '';
+        verificationInput.value = '';
+        verificationModal.classList.remove('hidden');
+        verificationModal.classList.add('flex');
+        verificationInput.focus();
+    }
+
+    function closeVerificationDialog() {
+        verificationModal.classList.add('hidden');
+        verificationModal.classList.remove('flex');
+    }
+
+    async function sendVerificationCode() {
+        const emailValue = document.getElementById('email').value.trim();
+        saveButton.disabled = true;
+        saveButton.textContent = 'Sending Code...';
+
+        try {
+            const response = await fetch("{{ route('account.send-code') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: emailValue }),
+            });
+
+            const payload = await response.json();
+
+            if (!response.ok) {
+                throw new Error(payload.message || 'Unable to send verification code.');
+            }
+
+            openVerificationModal();
+        } catch (error) {
+            sendCodeFeedback.textContent = error.message;
+            sendCodeFeedback.classList.remove('hidden');
+            verificationModal.classList.remove('hidden');
+            verificationModal.classList.add('flex');
+        } finally {
+            saveButton.disabled = false;
+            saveButton.textContent = 'Save Changes';
+        }
+    }
+
+    accountForm.addEventListener('submit', function (event) {
+        if (bypassVerification) {
+            return;
+        }
+
+        if (passwordInput.value.trim() !== '') {
+            event.preventDefault();
+            sendVerificationCode();
+        }
+    });
+
+    confirmSaveButton.addEventListener('click', function () {
+        const code = verificationInput.value.trim();
+
+        if (code.length !== 6) {
+            sendCodeFeedback.textContent = 'Enter the 6-digit verification code.';
+            sendCodeFeedback.classList.remove('hidden');
+            return;
+        }
+
+        verificationHiddenInput.value = code;
+        bypassVerification = true;
+        closeVerificationDialog();
+        accountForm.requestSubmit();
+    });
+
+    closeVerificationModal.addEventListener('click', function () {
+        closeVerificationDialog();
+    });
+
+    verificationModal.addEventListener('click', function (event) {
+        if (event.target === verificationModal) {
+            closeVerificationDialog();
+        }
+    });
 </script>
 
 @endsection

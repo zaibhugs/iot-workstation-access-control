@@ -261,10 +261,17 @@ TOP SUMMARY CARDS (RESPONSIVE)
     const getNeutralPrimaryColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-neutral-primary').trim() || "#FFFFFF";
     const brandTertiaryColor = getBrandTertiaryColor();
     const neutralPrimaryColor = getNeutralPrimaryColor();
+    const bluePalette = [
+        "#1447E6",
+        "#2563EB",
+        "#3B82F6",
+        "#60A5FA",
+        "#93C5FD",
+    ];
 
     const pieChartOptions = {
         series: courseCounts,
-        colors: [brandColor, brandSecondaryColor, brandTertiaryColor],
+        colors: bluePalette,
         chart: { height: 280, width: "100%", type: "pie" },
         stroke: { colors: [neutralPrimaryColor], lineCap: "" },
         plotOptions: { pie: { labels: { show: true }, size: "100%", dataLabels: { offset: -25 } } },
