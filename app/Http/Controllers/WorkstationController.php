@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\DeviceWorkstation;
+use App\Models\Workstations;
 use Illuminate\Http\Request;
 
 class WorkstationController extends Controller
@@ -11,7 +13,15 @@ class WorkstationController extends Controller
      */
     public function index()
     {
-        return view('admin.workstation.index');   
+       $deviceWorkstations = DeviceWorkstation::with(['workstation', 'device'])->get();
+
+    foreach ($deviceWorkstations as $dw) {
+    echo $dw->workstation->pc_code;  //workstation name
+    echo $dw->workstation->is_active; //workstation status
+    echo $dw->device->device_uid; //device UID
+    echo $dw->device->is_active; //device status
+}
+        return view('admin.workstation.index', compact('deviceWorkstations'));   
     }
 
     /**

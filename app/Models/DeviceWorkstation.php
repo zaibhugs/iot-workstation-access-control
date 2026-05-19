@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Devices;
+use App\Models\Device;
 use App\Models\Workstations;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,7 +16,7 @@ class DeviceWorkstation extends Model
 
     public function device()
     {
-        return $this->belongsTo(Devices::class);
+        return $this->belongsTo(Device::class);
     }
 
     public function workstation()
