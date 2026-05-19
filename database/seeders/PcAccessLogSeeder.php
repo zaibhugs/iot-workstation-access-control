@@ -103,10 +103,10 @@ class PcAccessLogSeeder extends Seeder
         $workstationIds = Workstations::pluck('id')->toArray();
 
         // ---- SEEDING START DATE ----
-        $startDate = Carbon::create(2026, 5, 6)->startOfDay();
-        $endDate = Carbon::create(2026, 5, 13)->endOfDay();
+        $startDate = Carbon::create(2026, 5, 13)->startOfDay();
+        $endDate = Carbon::create(2026, 5, 19)->endOfDay();
 
-         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
+        for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             // Random logs (24–36) with unique students per day
             $logsToday = rand(24, 36);
             $studentsToday = collect($students)->shuffle()->take($logsToday)->values();
