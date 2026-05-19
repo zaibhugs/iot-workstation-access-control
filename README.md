@@ -10,13 +10,7 @@ A private web application for managing access to IoT-enabled workstations. This 
 - Role-based permissions (e.g., student, staff, admin)
 - Access logs/tracking for security auditing
 - Web-based interface for easy management (Laravel Blade templates)
-
-## Tech Stack
-
-- **Backend:** PHP (Laravel framework)
-- **Frontend:** Blade templating engine (Laravel)
-- **Other:** [List any database, hardware integration, or IoT middleware as appropriate]
-
+  
 ## Getting Started
 
 1. **Clone the repository**
@@ -49,11 +43,6 @@ A private web application for managing access to IoT-enabled workstations. This 
    npm run dev
    ```
    Access the app at `http://localhost:8000`
-
-## Usage
-
-- Log in with your assigned credentials.
-- Use the dashboard to assign access rights, view logs, and manage workstations.
 
 ## Contributors
 
