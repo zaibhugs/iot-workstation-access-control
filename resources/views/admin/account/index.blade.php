@@ -134,15 +134,16 @@
     @method('DELETE')
 </form>
 
-{{-- CRITICAL IMPORT: This links this page to your new Artisan global component layout --}}
+{{-- Global Shared Component Layer --}}
 <x-verification-modal />
+<x-error-modal />
 
 <script>
     const accountForm = document.querySelector('form[action="{{ route('account.update') }}"]');
     const saveButton = document.getElementById('save-changes-button');
     const passwordInput = document.getElementById('new_password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
     
-    // Linked elements dynamically targeting fields inside the global component
     const verificationHiddenInput = document.getElementById('verification_code');
     let bypassVerification = false;
 
@@ -196,16 +197,11 @@
                 throw new Error(payload.message || 'Unable to send verification code.');
             }
 
-            // Calls the global entry function from your new component
+            // Code generation succeeded, show verification layout boxes
             openVerificationModal();
         } catch (error) {
-            // Target the error box context within your new component dynamically
-            const feedbackBox = document.getElementById('send-code-feedback');
-            if (feedbackBox) {
-                feedbackBox.textContent = error.message;
-                feedbackBox.classList.remove('hidden');
-            }
-            openVerificationModal();
+            // FIXED: Handled failure gracefully by opening the new global error modal instead
+            openGlobalErrorModal(error.message, 'Verification Failed');
         } finally {
             saveButton.disabled = false;
             saveButton.textContent = 'Save Changes';
@@ -217,13 +213,21 @@
             return;
         }
 
+        // Trigger code flow only if user modifies the password fields
         if (passwordInput.value.trim() !== '') {
             event.preventDefault();
+
+            // Client-side quick check matching confirmation passwords
+            if (passwordInput.value !== confirmPasswordInput.value) {
+                openGlobalErrorModal('Your new password and confirmation password fields do not match.', 'Password Mismatch');
+                return;
+            }
+
             sendVerificationCode();
         }
     });
 
-    // Handle incoming confirmation clicks originating from the component template layers
+    // Capture confirmation callbacks submitted via component templates
     document.addEventListener('DOMContentLoaded', () => {
         const confirmBtn = document.getElementById('confirm-save-button');
         const modalInput = document.getElementById('verification_code_input');
@@ -233,9 +237,10 @@
                 const code = modalInput.value.trim();
 
                 if (code.length !== 6) {
+                    // Update feedback inline context inside the verification box modal
                     const feedbackBox = document.getElementById('send-code-feedback');
                     if (feedbackBox) {
-                        feedbackBox.textContent = 'Enter the 6-digit verification code.';
+                        feedbackBox.textContent = 'Enter the complete 6-digit verification code.';
                         feedbackBox.classList.remove('hidden');
                     }
                     return;
@@ -254,6 +259,15 @@
             });
         }
     });
+    
 </script>
-
+@if($errors->has('verification_code'))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const codeError = "{{ $errors->first('verification_code') }}";
+            // This instantly calls your newly created global error modal!
+            openGlobalErrorModal(codeError, 'Invalid Code');
+        });
+    </script>
+@endif
 @endsection
