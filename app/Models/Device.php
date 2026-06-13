@@ -5,25 +5,32 @@ use Illuminate\Database\Eloquent\Model;
 
 class Device extends Model
 {
-    protected $fillable = ['device_uid', 'is_active', 'last_seen_at'];
+    protected $fillable = [
+    'device_uid',
+    'pairing_code',
+    'is_active',
+    'last_seen_at',
+    'api_token',
+    'token_created_at',
+    'token_expires_at',
+    ];
     
     protected $casts = [
         'last_seen_at' => 'datetime',
         'is_active' => 'boolean',
+        'token_created_at' => 'datetime',
+        'token_expires_at' => 'datetime',
     ];
 
     public function deviceWorkstations()
     {
-        // Note: Ensure the method name matches what you use in withCount()
+        
         return $this->hasMany(DeviceWorkstation::class);
     }
 
-    /**
-     * Logic to check if the device is full (Port limit of 2)
-     */
+
     public function getIsFullAttribute(): bool
     {
-        // withCount('deviceWorkstations') provides the 'device_workstations_count' attribute
         return $this->device_workstations_count >= 2;
     }
 
@@ -35,5 +42,49 @@ class Device extends Model
         $limit = 2;
         $count = $this->device_workstations_count ?? 0;
         return max(0, $limit - $count);
+    }
+
+    /**
+     * Generate and store a new API token
+     */
+    public function generateApiToken(): string
+    {
+        $token = hash('sha256', \Str::random(40) . time());
+        
+        $this->update([
+            'api_token' => $token,
+            'token_created_at' => now(),
+            'token_expires_at' => now()->addYear(),
+        ]);
+
+        return $token;
+    }
+
+    /**
+     * Check if token is valid
+     */
+    public function isTokenValid(): bool
+    {
+        if (!$this->api_token) {
+            return false;
+        }
+
+        if ($this->token_expires_at && $this->token_expires_at->isPast()) {
+            return false;
+        }
+
+        return $this->is_active;
+    }
+
+    /**
+     * Revoke the current token
+     */
+    public function revokeToken(): void
+    {
+        $this->update([
+            'api_token' => null,
+            'token_created_at' => null,
+            'token_expires_at' => null,
+        ]);
     }
 }

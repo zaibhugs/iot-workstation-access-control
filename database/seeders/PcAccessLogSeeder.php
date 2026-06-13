@@ -21,7 +21,6 @@ class PcAccessLogSeeder extends Seeder
             ['2510949-1','Aguilar','Polaris','De Guzman'],
             ['2510001-1','Aguillon','Marco Shyldon','Abrea'],
             ['2510281-1','Albarico','Ricardo','Bahinting'],
-            // ... continue to 60 ...
             ['2510516-1','Asares','Lennuel Angelo','Escupete'],
             ['2510568-1','Bibera','Albert','Dante'],
             ['2510665-2','Bolasco','Tamara','Garcia'],
@@ -103,8 +102,8 @@ class PcAccessLogSeeder extends Seeder
         $workstationIds = Workstations::pluck('id')->toArray();
 
         // ---- SEEDING START DATE ----
-        $startDate = Carbon::create(2026, 5, 13)->startOfDay();
-        $endDate = Carbon::create(2026, 5, 19)->endOfDay();
+        $startDate = Carbon::create(2026, 5, 21)->startOfDay();
+        $endDate = Carbon::create(2026, 5, 28)->endOfDay();
 
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             // Random logs (24–36) with unique students per day
