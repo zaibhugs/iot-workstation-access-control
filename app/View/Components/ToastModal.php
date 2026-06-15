@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class error-modal extends Component
+class ToastModal extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class error-modal extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.error-modal');
+        return view('components.toast-modal');
     }
 }

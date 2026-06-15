@@ -29,6 +29,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/device',[DeviceController::class,'index'])->name('device');
     Route::get('/device/add',[DeviceController::class,'create'])->name('device.create');
     Route::post('/device/add',[DeviceController::class,'store'])->name('device.store');
+Route::get('/device/{device}/edit',[DeviceController::class,'edit'])->name('device.edit');
     Route::put('/device/{device}', [DeviceController::class, 'update'])->name('device.update');
     // Account Route
     Route::get('/account',[AccountController::class,'index'])->name('account');

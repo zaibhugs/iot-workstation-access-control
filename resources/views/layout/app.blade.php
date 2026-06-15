@@ -122,6 +122,7 @@
 <!-- MAIN CONTENT -->
 <div class="p-4 sm:ml-64 mt-14">
 @yield('content')
+<x-success-toast />
 </div>
 
 <!-- FLOWBITE JS -->

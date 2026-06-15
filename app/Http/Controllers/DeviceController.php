@@ -50,9 +50,9 @@ class DeviceController extends Controller
         'is_active'    => false, 
     ]);
 
-    // CHANGE THIS TO REDIRECT BACK TO THE FORM VIEW
+   
     return redirect()
-        ->route('device.create') // Make sure this matches your GET route name for public function create()
+        ->route('device.create') 
         ->with('success', "Device added successfully! Code: {$pairingCode}");
 }
     public function update(Request $request, Device $device){
@@ -66,6 +66,9 @@ class DeviceController extends Controller
             'is_active' => $request->input('is_active'),
         ]);
 
-        return redirect()->route('device')->with('success', 'Device updated successfully.');
+        return redirect()->route('device.edit', $device)->with('success', 'Device updated successfully.');
+    }
+    public function edit(Device $device){
+        return view('admin.device.edit', compact('device'));
     }
 }
