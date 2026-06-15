@@ -27,7 +27,7 @@
                     
                     {{-- Navigation Action (Directly links to the target device detailed view page) --}}
                     <a 
-                        href="{{ session('paired_device_id') ? route('device.show', session('paired_device_id')) : route('device') }}" 
+                    href="{{ session('paired_device_id') ? route('device.edit', session('paired_device_id')) : route('device') }}"
                         class="w-full inline-flex items-center justify-center text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-xs px-3 py-2 transition-colors focus:outline-none"
                     >
                         <svg class="w-3.5 h-3.5 me-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

@@ -16,7 +16,7 @@ class Workstations extends Model
 
     public function deviceWorkstations()
     {
-        return $this->hasMany(DeviceWorkstation::class);
+        return $this->hasMany(DeviceWorkstation::class, 'workstation_id', 'id');
     }
 
     public function pcAccessLogs()

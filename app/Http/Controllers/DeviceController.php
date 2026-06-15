@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\Workstations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
@@ -70,5 +71,16 @@ class DeviceController extends Controller
     }
     public function edit(Device $device){
         return view('admin.device.edit', compact('device'));
+    }
+    public function show(Device $device ){
+        
+        $device= Device::where('id',$device->id)->first();
+        $deviceSlot= $device->deviceWorkstations()->with('workstation')->get();
+        $assignedWorkstations= Workstations::wherehas('deviceWorkstations', function($q) use ($device) {
+            $q->where('device_id', $device->id);
+        })->get();
+       
+        // 2. Pass the compiled dataset down to your blade view layout
+        return view('admin.device.view', compact('device', 'deviceSlot','assignedWorkstations'));
     }
 }

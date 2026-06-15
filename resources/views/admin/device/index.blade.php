@@ -71,6 +71,7 @@
             <thead class="bg-white text-base font-semibold text-black border-b border-gray-200">
                 <tr>
                     <th scope="col" class="px-8 py-6">Device Code</th>
+                    <th scope="col" class="px-8 py-6">Device Name</th>
                     <th scope="col" class="px-8 py-6 text-center">Status</th>
                     <th scope="col" class="px-8 py-6 text-center">Port Capacity</th>
                     <th scope="col" class="px-8 py-6 text-center">Actions</th>
@@ -80,6 +81,7 @@
                 @forelse($devices as $device)
                 <tr class="{{ $loop->even ? 'bg-gray-50/40' : 'bg-white' }} transition-colors hover:bg-blue-50/30">
                     <td class="px-8 py-7 font-medium text-gray-900">{{ $device->device_uid }}</td>
+                    <td class="px-8 py-7 font-medium text-gray-900">{{ $device->name }}</td>
                     <td class="px-8 py-7 text-center">
                         <span class="inline-flex items-center rounded-full px-4 py-1 text-sm font-medium {{ $device->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">
                             {{ $device->is_active ? 'Active' : 'Inactive' }}
@@ -108,7 +110,7 @@
                     <td class="px-8 py-7">
                         <div class="flex items-center justify-center gap-3">
 
-                            <a  class="group rounded-lg p-2 hover:bg-blue-50 transition-all" title="View Details">
+                            <a href="{{ route('device.show', $device->id) }}" class="group rounded-lg p-2 hover:bg-blue-50 transition-all" title="View Details">
                                 <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
