@@ -136,7 +136,7 @@
 
 {{-- Global Shared Component Layer --}}
 <x-verification-modal />
-<x-error_modal />
+<x-error-modal />
 
 <script>
     const accountForm = document.querySelector('form[action="{{ route('account.update') }}"]');
