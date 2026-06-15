@@ -4,15 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class DeviceController extends Controller
 {
     public function index(Request $request)
     {
-        // This creates a 'device_workstations_count' attribute on each model
+        
         $query = Device::withCount('deviceWorkstations');
 
-        //Handle Search (Device Code)
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function($q) use ($search) {
@@ -21,37 +21,40 @@ class DeviceController extends Controller
             });
         }
 
-        //Handle Status Filter (Active/Inactive)
+
         if ($request->filled('status')) {
             $status = $request->input('status') === 'active' ? 1 : 0;
             $query->where('is_active', $status);
         }
-
-        //Fetch the data with pagination
-
         $devices = $query->latest()->paginate(5)->withQueryString();
 
-        // 5. Return the view with the data
+    
         return view('admin.device.index', compact('devices'));
     }
     public function create(){
         return view('admin.device.add');
     }
-    public function store(Request $request){
-    $request->validate([
-        'device_uid' => 'required|unique:devices,device_uid',
-        'name' => 'required',
-        'is_active' => 'required|boolean',
+    public function store(Request $request)
+{
+    $validated = $request->validate([
+        'device_uid' => 'required|string|max:100|unique:devices,device_uid',
+        'name'       => 'required|string|max:255',
     ]);
+    
+    $pairingCode = strtoupper(Str::random(6));
 
     Device::create([
-        'device_uid' => $request->input('device_uid'),
-        'name' => $request->input('name'),
-        'is_active' => $request->input('is_active'),
+        'device_uid'   => $validated['device_uid'],
+        'name'         => $validated['name'],
+        'pairing_code' => $pairingCode,
+        'is_active'    => false, 
     ]);
 
-    return redirect()->route('device')->with('success', 'Device added successfully.');
-    }
+    // CHANGE THIS TO REDIRECT BACK TO THE FORM VIEW
+    return redirect()
+        ->route('device.create') // Make sure this matches your GET route name for public function create()
+        ->with('success', "Device added successfully! Code: {$pairingCode}");
+}
     public function update(Request $request, Device $device){
         $request->validate([
             'name' => 'required',
