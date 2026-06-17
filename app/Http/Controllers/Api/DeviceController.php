@@ -44,4 +44,18 @@ class DeviceController extends Controller
             'token' => $token,
         ], Response::HTTP_OK);
     }
+    public function heartbeat(Request $request)
+    {
+        $device =  $request->get('authenticated_device');
+
+        $device->update([
+            'last_seen_at'=> now()
+        ]);
+
+        return response()->json([
+            'success'=>true,
+            'message'=>'Heartbeat Acknowledged. Device status: Online',
+            'last_seen_at'=>$device->last_seen_at->toIso8601String()
+        ],200);
+    }
 }
