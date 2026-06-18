@@ -36,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/device/{device}/edit',[DeviceController::class,'edit'])->name('device.edit');
     Route::put('/device/{device}/update', [DeviceController::class, 'update'])->name('device.update');
     Route::get('/device/{device}', [DeviceController::class, 'show'])->name('device.show');
+    Route::delete('/device/{device}/delete', [DeviceController::class, 'destroy'])->name('device.destroy');
     // Account Route
     Route::get('/account',[AccountController::class,'index'])->name('account');
     Route::post('/account/send-code',[AccountController::class,'sendCode'])->name('account.send-code');

@@ -124,6 +124,7 @@
 @yield('content')
 <x-toast-modal />
 <x-error-modal />
+<x-confirm-modal />
 </div>
 
 <!-- FLOWBITE JS -->
