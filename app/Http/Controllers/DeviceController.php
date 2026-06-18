@@ -79,8 +79,16 @@ class DeviceController extends Controller
         $assignedWorkstations= Workstations::wherehas('deviceWorkstations', function($q) use ($device) {
             $q->where('device_id', $device->id);
         })->get();
-       
-        // 2. Pass the compiled dataset down to your blade view layout
+        
         return view('admin.device.view', compact('device', 'deviceSlot','assignedWorkstations'));
+    }
+    public function destroy($id)
+    {
+        $device = Device::findOrFail($id);
+        $device->delete();
+
+        return redirect()->route('device')
+            ->with('success', "Device '{$device->name}' has been successfully removed.")
+            ->with('success_redirect', route('device'));
     }
 }
