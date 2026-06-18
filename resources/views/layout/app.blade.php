@@ -122,6 +122,8 @@
 <!-- MAIN CONTENT -->
 <div class="p-4 sm:ml-64 mt-14">
 @yield('content')
+<x-toast-modal />
+<x-error-modal />
 </div>
 
 <!-- FLOWBITE JS -->

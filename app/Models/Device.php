@@ -7,6 +7,7 @@ class Device extends Model
 {
     protected $fillable = [
     'device_uid',
+    'name',
     'pairing_code',
     'is_active',
     'last_seen_at',

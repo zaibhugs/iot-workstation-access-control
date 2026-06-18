@@ -7,7 +7,11 @@ use App\Http\Controllers\WorkstationController;
 use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
 
-
+Route::get('/test-toast', function () {
+    return redirect()->route('device')
+        ->with('pairing_success', true)
+        ->with('paired_device_id', "ADMIN123"); // Replace 1 with a real device ID if available
+});
 Route::get('/login',[AuthController::class,'index']);
 Route::post('/login',[AuthController::class,'login'])->name('login');
 Route::get('/register',[AuthController::class,'create'])->name('register');
@@ -29,7 +33,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/device',[DeviceController::class,'index'])->name('device');
     Route::get('/device/add',[DeviceController::class,'create'])->name('device.create');
     Route::post('/device/add',[DeviceController::class,'store'])->name('device.store');
-    Route::put('/device/{device}', [DeviceController::class, 'update'])->name('device.update');
+    Route::get('/device/{device}/edit',[DeviceController::class,'edit'])->name('device.edit');
+    Route::put('/device/{device}/update', [DeviceController::class, 'update'])->name('device.update');
+    Route::get('/device/{device}', [DeviceController::class, 'show'])->name('device.show');
     // Account Route
     Route::get('/account',[AccountController::class,'index'])->name('account');
     Route::post('/account/send-code',[AccountController::class,'sendCode'])->name('account.send-code');

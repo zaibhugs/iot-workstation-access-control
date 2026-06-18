@@ -5,19 +5,18 @@
 @section('content')
 
 @php
-    /**
-     * Consistent height for Search + Selects + Button
-     */
+
     $controlHeight = 'h-[52px]';
 @endphp
 
-{{-- Toolbar --}}
+
 <div class="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3 lg:items-center">
-    {{-- Left: Search (2/3 width on lg) --}}
+
     <form class="w-full lg:col-span-2" method="GET" action="{{ route('device') }}">
         <label for="search" class="sr-only">Search</label>
         <div class="relative flex items-center">
-            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4"></div>
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
+            </div>
             <input
                 type="search"
                 id="search"
@@ -66,20 +65,15 @@
     </div>
 </div>
 
-@if($devices->total() > $devices->perPage())
-    
-@endif
-
 <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
     <div class="relative overflow-x-auto">
         <table class="w-full text-left text-sm text-gray-700">
             <thead class="bg-white text-base font-semibold text-black border-b border-gray-200">
                 <tr>
                     <th scope="col" class="px-8 py-6">Device Code</th>
+                    <th scope="col" class="px-8 py-6">Device Name</th>
                     <th scope="col" class="px-8 py-6 text-center">Status</th>
-                    <th scope="col" class="px-8 py-6 text-center">Connection</th>
                     <th scope="col" class="px-8 py-6 text-center">Port Capacity</th>
-                    <th scope="col" class="px-8 py-6">Last Seen</th>
                     <th scope="col" class="px-8 py-6 text-center">Actions</th>
                 </tr>
             </thead>
@@ -87,20 +81,13 @@
                 @forelse($devices as $device)
                 <tr class="{{ $loop->even ? 'bg-gray-50/40' : 'bg-white' }} transition-colors hover:bg-blue-50/30">
                     <td class="px-8 py-7 font-medium text-gray-900">{{ $device->device_uid }}</td>
+                    <td class="px-8 py-7 font-medium text-gray-900">{{ $device->name }}</td>
                     <td class="px-8 py-7 text-center">
                         <span class="inline-flex items-center rounded-full px-4 py-1 text-sm font-medium {{ $device->is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600' }}">
                             {{ $device->is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </td>
-                    <td class="px-8 py-7 text-center">
-                        @php
-                            $isOnline = $device->last_seen_at && $device->last_seen_at->gt(now()->subMinutes(5));
-                        @endphp
-                        <span class="inline-flex items-center gap-2 rounded-full px-4 py-1 text-sm font-medium {{ $isOnline ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
-                            <span class="h-2 w-2 rounded-full {{ $isOnline ? 'bg-green-600 animate-pulse' : 'bg-red-600' }}"></span>
-                            {{ $isOnline ? 'Online' : 'Offline' }}
-                        </span>
-                    </td>
+                    
                     <td class="px-8 py-7 text-center">
                         @php
                             $maxPorts = 2;
@@ -120,17 +107,23 @@
                             </div>
                         </div>
                     </td>
-                    <td class="px-8 py-7 text-gray-900">
-                        {{ $device->last_seen_at ? $device->last_seen_at->diffForHumans() : 'Never' }}
-                    </td>
                     <td class="px-8 py-7">
                         <div class="flex items-center justify-center gap-3">
-                            <a href="" class="group rounded-lg p-2 hover:bg-amber-50 transition-all" title="Edit">
-                                <svg class="w-5 h-5 text-gray-400 group-hover:text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+
+                            <a href="{{ route('device.show', $device->id) }}" class="group rounded-lg p-2 hover:bg-blue-50 transition-all" title="View Details">
+                                <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                                </svg>
+                            </a>
+
+                            <a href="{{ route('device.edit', $device->id) }}" class="group rounded-lg p-2 hover:bg-amber-50 transition-all" title="Edit">
+                                <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
                                 </svg>
                             </a>
+                            
                             <form action="" method="POST" class="inline-block" onsubmit="return confirm('Delete this device?');">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="group rounded-lg p-2 hover:bg-red-50 transition-all" title="Delete">
@@ -145,7 +138,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="px-8 py-24 text-center">
+                    <td colspan="4" class="px-8 py-24 text-center">
                         <div class="flex flex-col items-center justify-center">
                             <svg class="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
