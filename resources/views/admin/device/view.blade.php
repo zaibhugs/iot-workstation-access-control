@@ -33,7 +33,11 @@
                         </span>
                     @endif
                 </div>
-                <p class="text-sm text-gray-500 mt-1">Device Code: <span class="font-mono text-gray-700 font-medium">{{ $device->device_uid }}</span></p>
+                @if(!empty($device->pairing_code))
+                    <p class="text-sm text-gray-500 mt-1">Pairing Code: <span class="font-mono text-gray-700 font-medium">{{ $device->pairing_code }}</span></p>
+                @else
+                    <p class="text-sm text-gray-500 mt-1">Device Code: <span class="font-mono text-gray-700 font-medium">{{ $device->device_uid }}</span></p>
+                @endif
             </div>
 
             <div class="mt-4 md:mt-0">
@@ -46,33 +50,22 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {{-- Optimized Metric Row --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-xl">
             <div>
-                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Used Slots</p>
-                <div class="mt-2">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-yellow-50 text-yellow-800 border border-yellow-200">
-                            {{ $device->deviceWorkstations()->count() }} slots 
-                    </span>
-                </div>
-            </div>
-
-            <div>
-                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Remaining Slots</p>
-                <div class="mt-2">
-                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-yellow-50 text-yellow-800 border border-yellow-200">
-                    {{ 2 - $device->deviceWorkstations()->count() }} slots
-                    </span>
-                </div>
-            </div>
-
-            <div>
-                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Max Capacity</p>
-                <p class="mt-1 text-xl font-semibold text-gray-900">2 slots</p>
+                <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Slot Usage</p>
+                <p class="mt-1 text-2xl font-bold text-gray-900">
+                    {{ $device->deviceWorkstations()->count() }} 
+                    <span class="text-lg font-normal text-gray-400">/ 2 slots used</span>
+                </p>
+                <p class="text-xs text-gray-500 mt-0.5">
+                    {{ 2 - $device->deviceWorkstations()->count() }} available
+                </p>
             </div>
 
             <div>
                 <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Last Seen</p>
-                <p class="mt-1 text-xl font-semibold text-gray-900">
+                <p class="mt-1 text-2xl font-bold text-gray-900">
                     {{ $device->last_seen_at ? $device->last_seen_at->diffForHumans() : 'Never' }}
                 </p>
             </div>
@@ -112,7 +105,7 @@
                         @empty
                             <tr>
                                 <td colspan="3" class="px-6 py-8 text-center text-sm text-gray-400 italic">
-                                    No workstations mapped to this channel capacity slot.
+                                    No workstations assigned to this device yet.
                                 </td>
                             </tr>
                         @endforelse
