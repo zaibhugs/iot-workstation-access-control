@@ -45,6 +45,7 @@
             modal.classList.remove('flex');
         }
     }
+    {{-- Session Message Listener --}}
 
     // Backdrop click validation closure
     document.addEventListener('DOMContentLoaded', () => {

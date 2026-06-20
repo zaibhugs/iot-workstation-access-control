@@ -84,11 +84,19 @@ class DeviceController extends Controller
     }
     public function destroy($id)
     {
+    
         $device = Device::findOrFail($id);
+        if ($device->is_active) { 
+            return redirect()->route('device')
+                ->with('error', "Cannot delete device '{$device->name}' because it is currently Active. Please deactivate it before attempting to delete.");
+        }
+
+        if ($device->deviceWorkstations->count() > 0) {
+            return redirect()->route('device')
+                ->with('error', "Cannot delete device '{$device->name}' because it is currently assigned to one or more workstations. Please unassign it from all workstations before attempting to delete.");
+        }
         $device->delete();
 
-        return redirect()->route('device')
-            ->with('success', "Device '{$device->name}' has been successfully removed.")
-            ->with('success_redirect', route('device'));
+        return redirect()->route('device')->with('success', "Device '{$device->name}' was successfully deleted.");
     }
 }

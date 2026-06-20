@@ -167,5 +167,26 @@
 <div class="mt-6">
     {{ $devices->onEachSide(1)->links('vendor.pagination.flowbite') }}
 </div>
+<x-error-modal />
 
+{{-- Robust Session Listener --}}
+@if(session('error') || $errors->any())
+    <script>
+        // Use window.onload to guarantee absolutely everything (scripts + DOM) is loaded
+        window.addEventListener('load', () => {
+            @if(session('error'))
+                const errorMsg = "{!! addslashes(session('error')) !!}";
+            @else
+                const errorMsg = "{!! addslashes($errors->first()) !!}";
+            @endif
+            
+            // Check if the global function exists before calling it
+            if (typeof openGlobalErrorModal === 'function') {
+                openGlobalErrorModal(errorMsg, 'Deletion Failed');
+            } else {
+                console.error('openGlobalErrorModal function is not defined.');
+            }
+        });
+    </script>
+@endif
 @endsection
