@@ -51,7 +51,7 @@ class DeviceController extends Controller
         'is_active'    => false, 
     ]);
 
-   
+
     return redirect()
         ->route('device.create') 
         ->with('success', "Device added successfully! Code: {$pairingCode}");

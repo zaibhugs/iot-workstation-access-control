@@ -169,10 +169,10 @@
 </div>
 <x-error-modal />
 
-{{-- Robust Session Listener --}}
+
 @if(session('error') || $errors->any())
     <script>
-        // Use window.onload to guarantee absolutely everything (scripts + DOM) is loaded
+        
         window.addEventListener('load', () => {
             @if(session('error'))
                 const errorMsg = "{!! addslashes(session('error')) !!}";
@@ -180,7 +180,6 @@
                 const errorMsg = "{!! addslashes($errors->first()) !!}";
             @endif
             
-            // Check if the global function exists before calling it
             if (typeof openGlobalErrorModal === 'function') {
                 openGlobalErrorModal(errorMsg, 'Deletion Failed');
             } else {
