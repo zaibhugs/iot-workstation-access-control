@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function () {
     // Workstation  Routes
     Route::get('/workstation',[WorkstationController::class,'index'])->name('workstation');
     Route::get('/workstation/add',[WorkstationController::class,'create'])->name('workstation.create');
+    Route::post('/workstation/add',[WorkstationController::class,'store'])->name('workstation.store');
     Route::get('/workstation/pc1',[AdminController::class,'workstation_view'])->name('pc1');
     // Device Route
     Route::get('/device',[DeviceController::class,'index'])->name('device');
@@ -36,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/device/{device}/edit',[DeviceController::class,'edit'])->name('device.edit');
     Route::put('/device/{device}/update', [DeviceController::class, 'update'])->name('device.update');
     Route::get('/device/{device}', [DeviceController::class, 'show'])->name('device.show');
+    Route::delete('/device/{device}/delete', [DeviceController::class, 'destroy'])->name('device.destroy');
     // Account Route
     Route::get('/account',[AccountController::class,'index'])->name('account');
     Route::post('/account/send-code',[AccountController::class,'sendCode'])->name('account.send-code');

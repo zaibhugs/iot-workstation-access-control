@@ -51,12 +51,13 @@ class DeviceController extends Controller
         'is_active'    => false, 
     ]);
 
-   
+
     return redirect()
         ->route('device.create') 
         ->with('success', "Device added successfully! Code: {$pairingCode}");
 }
     public function update(Request $request, Device $device){
+        
         $request->validate([
             'name' => 'required',
             'is_active' => 'required|boolean',
@@ -79,8 +80,24 @@ class DeviceController extends Controller
         $assignedWorkstations= Workstations::wherehas('deviceWorkstations', function($q) use ($device) {
             $q->where('device_id', $device->id);
         })->get();
-       
-        // 2. Pass the compiled dataset down to your blade view layout
+        
         return view('admin.device.view', compact('device', 'deviceSlot','assignedWorkstations'));
+    }
+    public function destroy($id)
+    {
+    
+        $device = Device::findOrFail($id);
+        if ($device->is_active) { 
+            return redirect()->route('device')
+                ->with('error', "Cannot delete device '{$device->name}' because it is currently Active. Please deactivate it before attempting to delete.");
+        }
+
+        if ($device->deviceWorkstations->count() > 0) {
+            return redirect()->route('device')
+                ->with('error', "Cannot delete device '{$device->name}' because it is currently assigned to one or more workstations. Please unassign it from all workstations before attempting to delete.");
+        }
+        $device->delete();
+
+        return redirect()->route('device')->with('success', "Device '{$device->name}' was successfully deleted.");
     }
 }
