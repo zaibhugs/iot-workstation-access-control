@@ -117,5 +117,4 @@
         </div>
     </form>
 </div>
-<x-success-modal />
 @endsection

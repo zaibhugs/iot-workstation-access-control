@@ -16,7 +16,6 @@ class DeviceController extends Controller
             'pairing_code' => 'required|string', 
         ]);
 
-        
         $device = Device::where('device_uid', $validated['device_uid'])
                         ->where('pairing_code', $validated['pairing_code'])
                         ->first();
@@ -25,23 +24,23 @@ class DeviceController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid Device UID or Pairing Code.'
-            ], 404);
+            ], Response::HTTP_UNAUTHORIZED);
         }
-
-        
-        $device->update([
-            'is_active' => true,
-            'last_seen_at' => now(),
-            'pairing_code' => null, 
-        ]);
 
         
         $token = $device->api_token ?? $device->generateApiToken();
 
+        
+        $device->update([
+            'is_active'    => true,
+            'last_seen_at' => now(),
+            'pairing_code' => null, 
+            'api_token'    => $token, 
+        ]);
         return response()->json([
             'success' => true,
             'message' => 'Device successfully linked and activated!',
-            'token' => $token,
+            'token'   => $token,
         ], Response::HTTP_OK);
     }
     public function heartbeat(Request $request)

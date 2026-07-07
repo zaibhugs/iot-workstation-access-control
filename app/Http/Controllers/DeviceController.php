@@ -57,6 +57,7 @@ class DeviceController extends Controller
         ->with('success', "Device added successfully! Code: {$pairingCode}");
 }
     public function update(Request $request, Device $device){
+        
         $request->validate([
             'name' => 'required',
             'is_active' => 'required|boolean',
