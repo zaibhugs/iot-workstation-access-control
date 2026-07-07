@@ -49,7 +49,7 @@ A private web application for managing access to IoT-enabled workstations. This 
 - [ZaydiMucode](https://github.com/ZaydiMucode) 
 - [DalmacioHan](https://github.com/DalmacioHan) 
 - [Jhanrey16](https://github.com/Jhanrey16) 
-
+- [Derk Andre](https://github.com/derkandre)
 ## License
 
 This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
