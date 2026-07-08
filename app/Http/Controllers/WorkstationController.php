@@ -85,7 +85,8 @@ class WorkstationController extends Controller
         }
 
         return redirect()->route('workstation')
-            ->with('success', 'Workstation added successfully!');
+            ->with('success', 'Workstation added successfully!')
+            ->with('success_redirect', route('workstation'));
     }
 
     
