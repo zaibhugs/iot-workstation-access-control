@@ -24,7 +24,6 @@
 {{-- FILTERS CARD --}}
 <div class="mb-6 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-12">
-
         <div class="xl:col-span-1">
             <label for="date-from" class="text-xs font-medium text-gray-500">Date from</label>
             <input
@@ -86,15 +85,27 @@
             </select>
         </div>
 
-        {{-- Action Buttons Wrapper --}}
-        <div class="grid grid-cols-2 gap-2 pt-5 sm:col-span-2 lg:col-span-1 xl:col-span-2">
-            <button type="button" class="inline-flex {{ $controlHeight }} items-center justify-center rounded-xl bg-blue-700 px-5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-800">
-                Apply
-            </button>
-            <button type="button" class="inline-flex {{ $controlHeight }} items-center justify-center rounded-xl border border-gray-200 bg-white px-5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
-                Reset
-            </button>
+        <div class="xl:col-span-1">
+            <label for="reason" class="text-xs font-medium text-gray-500">Reason</label>
+            <select
+                id="reason"
+                class="mt-1 block w-full {{ $controlHeight }} rounded-xl border border-gray-200 bg-white px-4 pr-10 text-sm text-gray-900 shadow-sm focus:border-blue-600 focus:ring-blue-600">
+                <option>All Reasons</option>
+                <option>Authorized</option>
+                <option>Not Authorized</option>
+            </select>
         </div>
+
+    </div>
+
+    {{-- Action Buttons Wrapper --}}
+    <div class="mt-4 grid grid-cols-2 gap-2">
+        <button type="button" class="inline-flex {{ $controlHeight }} items-center justify-center rounded-xl bg-blue-700 px-5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-800">
+            Apply
+        </button>
+        <button type="button" class="inline-flex {{ $controlHeight }} items-center justify-center rounded-xl border border-gray-200 bg-white px-5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50">
+            Reset
+        </button>
     </div>
 </div>
 
