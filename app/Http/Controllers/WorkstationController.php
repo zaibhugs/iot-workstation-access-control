@@ -98,11 +98,13 @@ class WorkstationController extends Controller
     public function show(string $id)
     {
         $workstation = Workstations::findOrFail($id);
-        $deviceWorkstation = DeviceWorkstation::where('workstation_id', $id)->first();
-        $device = $deviceWorkstation ? Device::find($deviceWorkstation->device_id) : null;  
-        return view('admin.workstation.view', compact('workstation', 'device', 'deviceWorkstation'));
+        $workstation = Workstations::with('deviceWorkstations.device')->find($id);;
+        $assignment = $workstation->deviceWorkstations->first();
+        if ($assignment && $assignment->device) {
+        $deviceUid = $assignment->device->device_uid;
+        return view('admin.workstation.view', compact('workstation', 'deviceUid'));
     }
-
+    }
     /**
      * Show the form for editing the specified resource.
      */

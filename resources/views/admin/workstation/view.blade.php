@@ -21,7 +21,7 @@
             <div>
                 <div class="flex items-center space-x-3 flex-wrap gap-y-2">
                     <h1 class="text-3xl font-bold text-gray-900">
-                        {{ $workstation->name ?? 'Workstation Name' }}
+                        {{ $workstation->pc_code ?? 'Workstation Name' }}
                     </h1>
 
                     {{-- Active Badge --}}
@@ -50,7 +50,7 @@
                 <p class="text-sm text-gray-500 mt-2">
                     Device UID:
                     <span class="font-mono text-gray-700 font-medium">
-                        {{ $workstation->device_uid ?? '—' }}
+                        {{ $deviceUid ?? '—' }}
                     </span>
                 </p>
             </div>
@@ -70,12 +70,7 @@
         {{-- Essentials Grid --}}
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
 
-            <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
-                <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Pairing Code</p>
-                <p class="mt-2 text-base font-semibold text-gray-800 font-mono">
-                    {{ $workstation->pairing_code ?? 'N/A' }}
-                </p>
-            </div>
+
 
             <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
                 <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Last Seen</p>
@@ -85,30 +80,24 @@
             </div>
 
             <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
-                <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold">IP Address</p>
+                <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Last Logged Student</p>
                 <p class="mt-2 text-base font-semibold text-gray-800 font-mono">
-                    {{ $workstation->ip_address ?? '—' }}
+                    {{-- //query the log table and get the latest log entry for this workstation and display the student id and name if the workstation is currently in use, otherwise display "Not in Use" --}}
+                    {{ $workstation->most_recent_student ?? 'Available' }}
                 </p>
             </div>
 
             <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
-                <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold">MAC Address</p>
-                <p class="mt-2 text-base font-semibold text-gray-800 font-mono">
-                    {{ $workstation->mac_address ?? '—' }}
-                </p>
-            </div>
-
-            <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
-                <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Location</p>
+                <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold">PC PORT</p>
                 <p class="mt-2 text-base font-semibold text-gray-800">
-                    {{ $workstation->location ?? 'Unassigned' }}
+                    {{ $workstation->location ?? '' }}
                 </p>
             </div>
 
             <div class="rounded-xl border border-gray-100 bg-gray-50 p-4">
-                <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold">Firmware Version</p>
+                <p class="text-xs uppercase tracking-wide text-gray-400 font-semibold">STUDENT COURSE</p>
                 <p class="mt-2 text-base font-semibold text-gray-800">
-                    {{ $workstation->firmware_version ?? '—' }}
+                    {{ $workstation->pc_port ?? '—' }}
                 </p>
             </div>
         </div>
@@ -116,7 +105,7 @@
 
     {{-- Notes / Remarks Card --}}
     <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm">
-        <h2 class="text-lg font-bold text-gray-900">Device Notes</h2>
+        <h2 class="text-lg font-bold text-gray-900">Recent Connection Errors</h2>
         <p class="mt-3 text-sm leading-relaxed text-gray-600">
             {{ $workstation->notes ?? 'No notes available for this workstation yet.' }}
         </p>
