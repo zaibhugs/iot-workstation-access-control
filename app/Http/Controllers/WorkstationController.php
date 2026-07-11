@@ -97,7 +97,10 @@ class WorkstationController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $workstation = Workstations::findOrFail($id);
+        $deviceWorkstation = DeviceWorkstation::where('workstation_id', $id)->first();
+        $device = $deviceWorkstation ? Device::find($deviceWorkstation->device_id) : null;  
+        return view('admin.workstation.view', compact('workstation', 'device', 'deviceWorkstation'));
     }
 
     /**
