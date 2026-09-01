@@ -161,4 +161,16 @@
     {{ $devices->onEachSide(1)->links('vendor.pagination.flowbite') }}
 </div>
 
+{{-- Error/Success Message Handler --}}
+@if (session('error'))
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const errorMsg = "{!! addslashes(session('error')) !!}";
+            if (typeof openGlobalErrorModal === 'function') {
+                openGlobalErrorModal(errorMsg, 'Action Failed');
+            }
+        });
+    </script>
+@endif
+
 @endsection
