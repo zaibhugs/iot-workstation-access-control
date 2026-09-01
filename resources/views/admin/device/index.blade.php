@@ -167,25 +167,5 @@
 <div class="mt-6">
     {{ $devices->onEachSide(1)->links('vendor.pagination.flowbite') }}
 </div>
-<x-error-modal />
 
-
-@if(session('error') || $errors->any())
-    <script>
-        
-        window.addEventListener('load', () => {
-            @if(session('error'))
-                const errorMsg = "{!! addslashes(session('error')) !!}";
-            @else
-                const errorMsg = "{!! addslashes($errors->first()) !!}";
-            @endif
-            
-            if (typeof openGlobalErrorModal === 'function') {
-                openGlobalErrorModal(errorMsg, 'Deletion Failed');
-            } else {
-                console.error('openGlobalErrorModal function is not defined.');
-            }
-        });
-    </script>
-@endif
 @endsection

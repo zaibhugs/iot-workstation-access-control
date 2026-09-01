@@ -110,7 +110,8 @@ class WorkstationController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $workstation = Workstations::findOrFail($id);
+        return view('admin.workstation.edit', compact('workstation'));
     }
 
     /**
