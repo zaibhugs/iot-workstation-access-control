@@ -19,9 +19,10 @@
     <!-- Form Card -->
     <div class="bg-white border border-gray-200 rounded-lg shadow-sm">
 
-        <form action="" method="" class="p-6">
+        <form action="{{ route('workstation.update', $workstation->id) }}" method="POST" class="p-6">
             @csrf
-            
+            @method('PUT')
+
             <div class="grid gap-6 mb-6 md:grid-cols-2">
                 <!-- Workstation Code -->
                 <div class="col-span-2 md:col-span-1">

@@ -33,7 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/workstation/add',[WorkstationController::class,'store'])->name('workstation.store');
     Route::get('/workstation/{workstation}',[WorkstationController::class,'show'])->name('workstation.view');
     Route::get('/workstation/{workstation}/edit',[WorkstationController::class,'edit'])->name('workstation.edit');
-    
+    Route::put('/workstation/{workstation}/update',[WorkstationController::class,'update'])->name('workstation.update');
+
     // Device Route
     Route::get('/device',[DeviceController::class,'index'])->name('device');
     Route::get('/device/add',[DeviceController::class,'create'])->name('device.create');

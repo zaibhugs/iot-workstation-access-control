@@ -112,6 +112,7 @@ class WorkstationController extends Controller
     {
         $workstation = Workstations::findOrFail($id);
         return view('admin.workstation.edit', compact('workstation'));
+
     }
 
     /**
@@ -119,7 +120,22 @@ class WorkstationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+    
+        $workstation = Workstations::findOrFail($id);
+
+        $request ->validate([
+            'pc_code' => 'required|string|max:100|unique:workstations,pc_code,' . $workstation->id,
+            'status'  => 'required|boolean', 
+        ]);
+
+        $workstation->update([
+            'pc_code'=> $request->input('pc_code'),
+            'is_active' => $request->input('status'),
+        ]);
+
+        return redirect()->route('workstation')
+            ->with('success', 'Workstation updated successfully!');
+            
     }
 
     /**
