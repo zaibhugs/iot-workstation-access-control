@@ -143,6 +143,11 @@ class WorkstationController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        
+        $workstation = Workstations::findOrFail($id);
+        $workstation->delete();
+
+        return redirect()->route('workstation')
+            ->with('success', 'Workstation deleted successfully!');
     }
 }

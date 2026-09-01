@@ -103,14 +103,7 @@
                                 
                                 <button 
                                     type="button" 
-                                    onclick="openGlobalConfirmModal({
-                                        type: 'delete',
-                                        title: 'Delete Device',
-            
-                                        btnText: 'Delete Device',
-                                        
-                                        
-                                    })"
+                                    onclick="openDeleteModal('{{ route('workstation.destroy', $dw->workstation->id) }}', 'Are you sure you want to delete workstation {{ $dw->workstation->pc_code }}?')"
                                     class="group rounded-lg p-2 hover:bg-red-50 transition-all" 
                                     title="Delete"
                                 >

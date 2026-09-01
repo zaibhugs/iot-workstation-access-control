@@ -126,14 +126,7 @@
                             
                             <button 
                                 type="button" 
-                                onclick="openGlobalConfirmModal({
-                                    type: 'delete',
-                                    title: 'Delete Device',
-                                    message: 'Are you sure you want to delete {{ $device->name }} ({{ $device->device_uid }})? This action cannot be undone.',
-                                    btnText: 'Delete Device',
-                                    method: 'DELETE',
-                                    action: '{{ route('device.destroy', $device->id) }}'
-                                })"
+                                onclick="openDeleteModal('{{ route('device.destroy', $device->id) }}', 'Are you sure you want to delete {{ $device->name }} ({{ $device->device_uid }})? This action cannot be undone.')"
                                 class="group rounded-lg p-2 hover:bg-red-50 transition-all" 
                                 title="Delete"
                             >
