@@ -64,7 +64,7 @@
                         <th scope="col" class="px-8 py-6">Workstation Code</th>
                         <th scope="col" class="px-8 py-6">Status</th>
                         <th scope="col" class="px-8 py-6">Device Code</th>
-                        <th scope="col" class="px-8 py-6">Device Status</th>
+                        
                         <th scope="col" class="px-8 py-6 text-center">Actions</th>
                     </tr>
                 </thead>
@@ -79,11 +79,6 @@
                             </span>
                         </td>
                         <td class="px-8 py-7 text-gray-900">{{ $dw->device->device_uid }}</td>
-                        <td class="px-8 py-7">
-                            <span class="{{ $dw->device->is_active ? 'text-green-700 bg-green-100' : 'text-red-700 bg-red-100' }} px-2 py-1 rounded-full">
-                            {{ $dw->device->is_active ? 'Active' : 'Inactive' }}
-                            </span>
-                        </td>
                         <td class="px-8 py-7">
                             <div class="flex items-center justify-center gap-3">
 

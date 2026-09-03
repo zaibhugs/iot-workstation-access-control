@@ -17,9 +17,9 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Bebas Neue', sans-serif;
+    --font-sans: 'Bebas Neue', 'poppins';
 }
 
 body {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Bebas Neue', 'poppins';
 }

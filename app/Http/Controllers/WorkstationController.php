@@ -25,24 +25,11 @@ class WorkstationController extends Controller
     public function create()
     {
     
-    $fullDeviceIds = DeviceWorkstation::groupBy('device_id')
-        ->havingRaw('COUNT(*) >= 2')
-        ->pluck('device_id');
+        $devicesName = Device::whereNotNull('api_token')
+        ->where('is_active', 1)
+        ->get(['id', 'device_uid', 'name', 'is_active']);
 
-
-    $device = Device::where('is_active', true)
-        ->whereNotIn('id', $fullDeviceIds)
-        ->get();
-
-    
-    $usedPortsByDevice = DeviceWorkstation::whereIn('pc_port', ['1', '2'])
-        ->get()
-        ->groupBy('device_id')
-        ->map(function ($items) {
-            return $items->pluck('pc_port')->toArray();
-        });
-
-    return view('admin.workstation.add', compact('device', 'usedPortsByDevice'));
+        return view('admin.workstation.add', compact('devicesName'));
     }
 
     /**

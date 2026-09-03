@@ -35,18 +35,16 @@
 </div>
 
 <script>
-    // Global function to trigger the error box from ANY script file or AJAX catch block
     function openGlobalErrorModal(errorMessage = '', errorTitle = 'Security Error') {
         const modal = document.getElementById('error-modal');
         const panel = document.getElementById('error-modal-panel');
         const titleEl = document.getElementById('error-modal-title');
         const msgEl = document.getElementById('error-modal-message');
 
-        // Update text if provided
         if (titleEl && errorTitle) titleEl.textContent = errorTitle;
         if (msgEl && errorMessage) msgEl.textContent = errorMessage;
 
-        // Animate in
+
         if (modal && panel) {
             modal.classList.remove('opacity-0', 'pointer-events-none');
             modal.classList.add('opacity-100');
@@ -60,7 +58,7 @@
         const modal = document.getElementById('error-modal');
         const panel = document.getElementById('error-modal-panel');
         
-        // Animate out
+
         if (modal && panel) {
             modal.classList.remove('opacity-100');
             modal.classList.add('opacity-0', 'pointer-events-none');
