@@ -12,11 +12,20 @@ class WorkstationController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        
-        $deviceWorkstations = DeviceWorkstation::with(['workstation', 'device'])->get();
-        return view('admin.workstation.index', compact('deviceWorkstations'));   
+        $query = DeviceWorkstation::with(['workstation', 'device']);
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->whereHas('workstation', function ($q) use ($search) {
+                $q->where('pc_code', 'like', "%{$search}%");
+            });
+        }
+
+        $deviceWorkstations = $query->latest()->paginate(5)->withQueryString();
+
+        return view('admin.workstation.index', compact('deviceWorkstations'));
     }
 
     /**
