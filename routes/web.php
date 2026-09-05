@@ -27,6 +27,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard',[AdminController::class,'dashboard'])->name('dashboard');
     Route::get('/analytics',[AnalyticsController::class,'index'])->name('analytics');
     Route::get('/reports',[ReportsController::class,'index'])->name('reports');
+    Route::get('/reports/csv',[ReportsController::class,'exportCsv'])->name('reports.csv');
+    Route::get('/reports/pdf',[ReportsController::class,'exportPdf'])->name('reports.pdf');
     // Workstation  Routes
     Route::get('/workstation',[WorkstationController::class,'index'])->name('workstation');
     Route::get('/workstation/add',[WorkstationController::class,'create'])->name('workstation.create');
