@@ -62,23 +62,17 @@ class WorkstationController extends Controller
                 ->withErrors(['pc_port' => 'Selected port is already used for this device.']);
         }
 
-        try {
-            DB::transaction(function () use ($validated) {
-                $workstation = Workstations::create([
-                    'pc_code' => $validated['pc_code'],
-                ]);
+        DB::transaction(function () use ($validated) {
+            $workstation = Workstations::create([
+                'pc_code' => $validated['pc_code'],
+            ]);
 
-                DeviceWorkstation::create([
-                    'device_id'      => $validated['device_id'],
-                    'pc_port'        => $validated['pc_port'],
-                    'workstation_id' => $workstation->id,
-                ]);
-            });
-        } catch (\Exception $e) {
-            return back()
-                ->withInput()
-                ->withErrors(['general' => 'Failed to save workstation or link to device.']);
-        }
+            DeviceWorkstation::create([
+                'device_id'      => $validated['device_id'],
+                'pc_port'        => $validated['pc_port'],
+                'workstation_id' => $workstation->id,
+            ]);
+        });
 
         return redirect()->route('workstation')
             ->with('success', 'Workstation added successfully!')
