@@ -130,6 +130,7 @@ class ReportsController extends Controller
             ->select(
                 'pc_access_logs.id',
                 'pc_access_logs.occurred_at',
+                'pc_access_logs.student_name',
                 'pc_access_logs.course',
                 'workstations.pc_code as workstation',
                 'pc_access_logs.event_type',
