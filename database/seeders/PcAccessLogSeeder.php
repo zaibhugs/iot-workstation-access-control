@@ -145,7 +145,7 @@ class PcAccessLogSeeder extends Seeder
                     'workstation_id'       => $workstation_id,
                     'event_type'           => 'LOGIN',
                     'result'               => rand(0, 9) > 0 ? 'SUCCESS' : 'FAIL',
-                    'reason'               => rand(0, 9) > 0 ? 'Authorized' : 'Not Authorized',
+                    'reason'               => 'Authorized',
                     'student_external_id'  => $studentId,
                     'student_name'         => $studentName,
                     'course'               => $course,
