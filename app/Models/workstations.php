@@ -10,6 +10,7 @@ class Workstations extends Model
 {
     protected $fillable = [
         'pc_code',
+        'device_id',
         'is_active',
     ];
 

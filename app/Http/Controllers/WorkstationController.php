@@ -2,7 +2,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
-use App\Models\DeviceWorkstation;
 use App\Models\Workstations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB; 
@@ -14,13 +13,11 @@ class WorkstationController extends Controller
      */
     public function index(Request $request)
     {
-        $query = DeviceWorkstation::with(['workstation', 'device']);
+        $query = Workstations::query();
 
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->whereHas('workstation', function ($q) use ($search) {
-                $q->where('pc_code', 'like', "%{$search}%");
-            });
+            $query->where('pc_code', 'like', "%{$search}%");
         }
 
         $deviceWorkstations = $query->latest()->paginate(5)->withQueryString();
@@ -49,28 +46,12 @@ class WorkstationController extends Controller
         $validated = $request->validate([
             'pc_code'   => 'required|string|max:100|unique:workstations,pc_code',
             'device_id' => 'required|exists:devices,id',
-            'pc_port'   => 'required|in:1,2',
+            
         ]);
-
-        $portAlreadyUsed = DeviceWorkstation::where('device_id', $validated['device_id'])
-            ->where('pc_port', $validated['pc_port'])
-            ->exists();
-
-        if ($portAlreadyUsed) {
-            return back()
-                ->withInput()
-                ->withErrors(['pc_port' => 'Selected port is already used for this device.']);
-        }
-
         DB::transaction(function () use ($validated) {
             $workstation = Workstations::create([
                 'pc_code' => $validated['pc_code'],
-            ]);
-
-            DeviceWorkstation::create([
-                'device_id'      => $validated['device_id'],
-                'pc_port'        => $validated['pc_port'],
-                'workstation_id' => $workstation->id,
+                'device_id' => $validated['device_id'],
             ]);
         });
 
@@ -88,10 +69,12 @@ class WorkstationController extends Controller
     public function show(string $id)
     {
         $workstation = Workstations::findOrFail($id);
-        $workstation = Workstations::with('deviceWorkstations.device')->find($id);;
-        $assignment = $workstation->deviceWorkstations->first();
-        if ($assignment && $assignment->device) {
-        $deviceUid = $assignment->device->device_uid;
+        $assignment = $workstation->device()->get();
+        
+        if ($assignment->isEmpty()) {
+            return view('admin.workstation.view', compact('workstation'));
+        } else {
+        $deviceUid = $assignment->first()->device_uid;
         return view('admin.workstation.view', compact('workstation', 'deviceUid'));
     }
     }
