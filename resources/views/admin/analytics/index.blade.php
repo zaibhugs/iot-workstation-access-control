@@ -19,7 +19,7 @@
                         </svg>
                     </div>
                     <div class="text-right ms-3">
-                        <div class="text-3xl font-semibold text-heading leading-none" id="total-workstations-top">10</div>
+                        <div class="text-3xl font-semibold text-heading leading-none" id="total-workstations-top">{{ $activeDevices }}</div>
                         <div class="mt-1 text-sm text-body">Active Devices</div>
                     </div>
                 </div>
@@ -33,8 +33,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
                         </svg>
                     </div>
-                    <div class="text-right ms-3">
-                        <div class="text-3xl font-semibold text-heading leading-none" id="total-workstations-top">siya</div>
+<div class="text-right ms-3">
+                        <div class="text-3xl font-semibold text-heading leading-none" id="total-workstations-top">{{ $popularDevice?->name ?? $onlineDevices }}</div>
                         <div class="mt-1 text-sm text-body">Popular Device</div>
                     </div>
                 </div>
@@ -49,7 +49,7 @@
                         </svg>
                     </div>
                     <div class="text-right ms-3">
-                        <div class="text-3xl font-semibold text-heading leading-none" id="total-access-events">10</div>
+                        <div class="text-3xl font-semibold text-heading leading-none" id="total-access-events">{{ $totalAccessEvents }}</div>
                         <div class="mt-1 text-sm text-body">Access Events</div>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                         </svg>
                     </div>
                     <div class="text-right ms-3">
-                        <div class="text-3xl font-semibold text-heading leading-none" id="total-failed-attempts">10</div>
+                        <div class="text-3xl font-semibold text-heading leading-none" id="total-failed-attempts">{{ $failedAttempts }}</div>
                         <div class="mt-1 text-sm text-body">Failed Access Events</div>
                     </div>
                 </div>
@@ -171,10 +171,82 @@
         </div>
     </div>
 
+    @php
+    $appLabels = $topApps->pluck('app_name')->values()->all();
+    $appStats  = $topApps->pluck('total_seconds')->values()->all();
+    @endphp
+
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-12">
+        {{-- MOST USED APPS --}}
+        <div class="xl:col-span-1">
+            <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
+                <div class="flex justify-between items-start pb-4 mb-4 border-b border-light">
+                    <div>
+                        <h5 class="text-2xl font-bold text-heading">Most Used Apps</h5>
+                        <p class="text-sm text-body">Foreground usage time (from the kiosk)</p>
+                    </div>
+                </div>
+
+                <div id="apps-chart" class="mb-4"></div>
+
+                @if (count($appLabels) === 0)
+                    <p class="text-sm text-body">No usage data yet. Unlock a workstation and start using apps to record usage.</p>
+                @endif
+            </div>
+        </div>
+
+        {{-- TOP STUDENTS --}}
+        <div class="xl:col-span-1">
+            <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
+                <div class="flex justify-between items-start pb-4 mb-4 border-b border-light">
+                    <div>
+                        <h5 class="text-2xl font-bold text-heading">Top Students this month</h5>
+                        <p class="text-sm text-body">By active usage time</p>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm">
+                        <thead>
+                            <tr class="border-b border-light text-xs font-semibold uppercase tracking-wide text-body">
+                                <th class="px-3 py-2">#</th>
+                                <th class="px-3 py-2">Student</th>
+                                <th class="px-3 py-2">Sessions</th>
+                                <th class="px-3 py-2">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($topStudents as $i => $student)
+                                <tr class="border-b border-light/60">
+                                    <td class="px-3 py-2 text-body">{{ $i + 1 }}</td>
+                                    <td class="px-3 py-2 text-heading font-medium">{{ $student->student_name }}</td>
+                                    <td class="px-3 py-2 text-body">{{ $student->sessions }}</td>
+                                    <td class="px-3 py-2 text-body">{{ gmdate('H:i', $student->total_seconds) }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="px-3 py-4 text-sm text-body">No usage data yet.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+    const courseLabels = @json($courseLabels);
+    const courseCounts = @json($courseCounts);
+    const maleData = @json($male);
+    const femaleData = @json($female);
+    const columnChartDays = @json($columnChartDays);
+    const appLabels = @json($appLabels);
+    const appStats  = @json($appStats);
+
     const getBrandTertiaryColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-fg-brand-strong').trim() || "#1E40AF";
     const getNeutralPrimaryColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-neutral-primary').trim() || "#FFFFFF";
     const brandTertiaryColor = getBrandTertiaryColor();
@@ -252,6 +324,45 @@
     if(document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
         const columnChart = new ApexCharts(document.getElementById("column-chart"), columnChartOptions);
         columnChart.render();
+    }
+
+    /* ════════════ BAR Most Used Apps ════════════ */
+    const appChartOptions = {
+        series: [{
+            name: "Seconds",
+            data: appStats
+        }],
+        chart: {
+            type: "bar",
+            height: "320px",
+            fontFamily: "Inter, sans-serif",
+            toolbar: { show: false },
+        },
+        plotOptions: { bar: { horizontal: true, barHeight: "50%", borderRadiusApplication: "end", borderRadius: 6 } },
+        tooltip: { style: { fontFamily: "Inter, sans-serif" } },
+        stroke: { show: false },
+        grid: { show: true, strokeDashArray: 4, padding: { left: 2, right: 2, top: -14 } },
+        dataLabels: {
+            enabled: true,
+            textAnchor: "start",
+            style: { fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "12px" },
+            offsetX: 6,
+            formatter: function (val) {
+                const m = Number(val) / 60;
+                return m < 60
+                    ? Math.round(m) + " min"
+                    : (m / 60).toFixed(1) + " hr";
+            }
+        },
+        colors: [getBrandTertiaryColor()],
+        xaxis: { labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
+        yaxis: { labels: { show: true, style: { fontFamily: "Inter, sans-serif", cssClass: 'text-xs font-normal fill-body' } } }
+    };
+
+    if (document.getElementById("apps-chart") && typeof ApexCharts !== 'undefined' && appLabels.length > 0) {
+        appChartOptions.series[0].data = appLabels.map((label, i) => ({ x: label, y: appStats[i] }));
+        const appChart = new ApexCharts(document.getElementById("apps-chart"), appChartOptions);
+        appChart.render();
     }
     });
 </script>

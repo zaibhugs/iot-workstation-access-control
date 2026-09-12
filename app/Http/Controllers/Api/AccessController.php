@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\DeviceWorkstation;
 use App\Models\PcAccessLogs;
+use App\Models\PcAppUsage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -135,6 +136,48 @@ class AccessController extends Controller
     }
 
     /**
+     * Record foreground app usage for one session.
+     *
+     * Expected body (sent by the desktop kiosk):
+     *   session_id  - id returned by /api/access/scan
+     *   occurred_at - optional ISO-8601 flush time (defaults to now)
+     *   apps        - [{ "app": "chrome", "seconds": 120 }, ...]
+     */
+    public function usage(Request $request)
+    {
+        $validated = $request->validate([
+            'session_id'     => 'required|string|max:64',
+            'occurred_at'    => 'sometimes|date',
+            'apps'           => 'required|array',
+            'apps.*.app'     => 'required|string|max:100',
+            'apps.*.seconds' => 'required|integer|min:0',
+        ]);
+
+        $occurredAt = isset($validated['occurred_at'])
+            ? \Illuminate\Support\Carbon::parse($validated['occurred_at'])
+            : now();
+
+        $session = PcAccessLogs::where('session_id', $validated['session_id'])
+            ->where('event_type', 'time_in')
+            ->first();
+
+        foreach ($validated['apps'] as $app) {
+            PcAppUsage::create([
+                'session_id'  => $validated['session_id'],
+                'rfid_uid'    => $session?->rfid_uid,
+                'app_name'    => $app['app'],
+                'seconds'     => $app['seconds'],
+                'occurred_at' => $occurredAt,
+            ]);
+        }
+
+        return response()->json([
+            'success'  => true,
+            'recorded' => count($validated['apps']),
+        ], Response::HTTP_OK);
+    }
+
+    /**
      * Query the university MIS for a card.
      *
      * Returns [StudentParameters|null, reason]. A null student is always
@@ -157,11 +200,12 @@ class AccessController extends Controller
                 $data = $response->json() ?? [];
 
                 return [[
-                    'cardId'      => $data['cardId'] ?? $data['CardId'] ?? $cardId,
-                    'firstName'   => $data['firstName'] ?? $data['FirstName'] ?? '',
-                    'lastName'    => $data['lastName'] ?? $data['LastName'] ?? '',
-                    'middleName'  => $data['middleName'] ?? $data['MiddleName'] ?? '',
-                    'course'      => $data['course'] ?? $data['Course'] ?? '',
+                    'cardId'       => $data['cardId'] ?? $data['CardId'] ?? $cardId,
+                    'studentNumber'=> $data['studentNumber'] ?? $data['StudentNumber'] ?? '',
+                    'firstName'    => $data['firstName'] ?? $data['FirstName'] ?? '',
+                    'lastName'     => $data['lastName'] ?? $data['LastName'] ?? '',
+                    'middleName'   => $data['middleName'] ?? $data['MiddleName'] ?? '',
+                    'course'       => $data['course'] ?? $data['Course'] ?? '',
                 ], null];
             }
 

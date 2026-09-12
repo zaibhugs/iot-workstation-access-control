@@ -19,4 +19,5 @@ Route::middleware('device.auth')->group(function () {
     // RFID scan / session endpoints used by the desktop kiosk
     Route::post('/access/scan', [AccessController::class, 'scan']);
     Route::post('/access/logout', [AccessController::class, 'logout']);
+    Route::post('/access/usage', [AccessController::class, 'usage']);
 });
