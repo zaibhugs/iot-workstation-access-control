@@ -84,7 +84,7 @@
                     
                     <td class="px-8 py-7 text-center">
                         @php
-                            $maxPorts = 2;
+                            $maxPorts = 1;
                             $usedPorts = $device->device_workstations_count ?? 0;
                             $percentage = ($usedPorts / $maxPorts) * 100;
                             $colorClass = $usedPorts >= $maxPorts ? 'text-red-700' : ($usedPorts > 0 ? 'text-yellow-700' : 'text-blue-700');

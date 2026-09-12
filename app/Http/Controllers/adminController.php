@@ -23,10 +23,10 @@ class AdminController extends Controller
         $totalWorkstations = Workstations::count();
         $activeWorkstations = Workstations::where('is_active', 1)->count();
 
-        // Each device provides two slots; each device-workstation mapping occupies one.
-        $totalSlots = $totalDevices * 2;
-        $occupiedSlots = DeviceWorkstation::count();
-        $slotUtilization = $totalSlots > 0 ? round(($occupiedSlots / $totalSlots) * 100) : 0;
+        // Each device provides one slot; each device-workstation mapping occupies one.
+        $totalSlots = $totalDevices ;
+        
+        $slotUtilization = $totalSlots > 0 ? round(($totalWorkstations / $totalSlots) * 100) : 0;
 
         $weekStart = Carbon::today()->startOfWeek(Carbon::MONDAY);
 
