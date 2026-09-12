@@ -49,7 +49,7 @@
                         </svg>
                     </div>
                     <div class="text-right ms-3">
-                        <div class="text-3xl font-semibold text-heading leading-none" id="total-access-events">10</div>
+                        <div class="text-3xl font-semibold text-heading leading-none" id="total-access-events">{{ $totalEvents }}</div>
                         <div class="mt-1 text-sm text-body">Access Events</div>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
                         </svg>
                     </div>
                     <div class="text-right ms-3">
-                        <div class="text-3xl font-semibold text-heading leading-none" id="total-failed-attempts">10</div>
+                        <div class="text-3xl font-semibold text-heading leading-none" id="total-failed-attempts">{{ $failedEvents }}</div>
                         <div class="mt-1 text-sm text-body">Failed Access Events</div>
                     </div>
                 </div>
