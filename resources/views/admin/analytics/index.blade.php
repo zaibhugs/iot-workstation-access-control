@@ -49,7 +49,7 @@
                         </svg>
                     </div>
                     <div class="text-right ms-3">
-                        <div class="text-3xl font-semibold text-heading leading-none" id="total-access-events">{{ $totalAccessEvents }}</div>
+                        <div class="text-3xl font-semibold text-heading leading-none" id="total-access-events">10</div>
                         <div class="mt-1 text-sm text-body">Access Events</div>
                     </div>
                 </div>
@@ -66,168 +66,96 @@
                         </svg>
                     </div>
                     <div class="text-right ms-3">
-                        <div class="text-3xl font-semibold text-heading leading-none" id="total-failed-attempts">{{ $failedAttempts }}</div>
+                        <div class="text-3xl font-semibold text-heading leading-none" id="total-failed-attempts">10</div>
                         <div class="mt-1 text-sm text-body">Failed Access Events</div>
                     </div>
                 </div>
             </div>
         </div>
+
     </div>
-
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-12 ">
-        <div class="xl:col-span-1">
-            <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
-                <div class="flex justify-between items-start pb-4 mb-4 border-b border-light">
-                    <div>
-                        <div class="flex items-center mb-2">
-                            <div class="w-12 h-12 bg-neutral-primary-medium border border-default-medium flex items-center justify-center rounded-full me-3">
-                                <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 20v-9l-4 1.125V20h4Zm0 0h8m-8 0V6.66667M16 20v-9l4 1.125V20h-4Zm0 0V6.66667M18 8l-6-4-6 4m5 1h2m-2 3h2"/>
-                                </svg>
-                            </div>
-
-                            <h5 class="text-2xl font-bold text-heading me-2">Course Distribution</h5>
-
-                            <svg data-popover-target="traffic-info" data-popover-placement="bottom" class="w-5 h-5 text-body hover:text-heading cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.529 9.988a2.502 2.502 0 1 1 5 .191A2.441 2.441 0 0 1 12 12.582V14m-.01 3.008H12M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                            <div data-popover id="traffic-info" role="tooltip" class="absolute z-10 p-3 invisible inline-block text-sm text-body transition-opacity duration-300 bg-neutral-primary-soft border border-default rounded-base shadow-xs opacity-0 w-72">
-                                <div>
-                                    <h3 class="font-semibold text-heading mb-2">Course Distribution</h3>
-                                    <p class="mb-4">This chart shows the distribution of courses across different categories in the library system.</p>
-                                </div>
-                                <div data-popper-arrow></div>
-                            </div>
+    <!--table-->
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-12 mb-4">
+        <!-- Card 1: Top 10 Students -->
+        <div class="rounded-lg border border-gray-200 bg-white">
+            <div>
+                <div class="w-full bg-neutral-primary-soft p-5 border-b border-light flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-black uppercase">Top 10 Students</h3>
+                    <div class="relative">
+                        <button id="topStudentsDropdownButton" data-dropdown-toggle="topStudentsDropdown" data-dropdown-placement="bottom" class="text-sm font-medium text-body hover:text-heading inline-flex items-center" type="button">
+                            {{ $studentRangeLabel }}
+                            <svg class="w-4 h-4 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
+                        </button>
+                        <!-- Absolute placement and high z-index added -->
+                        <div id="topStudentsDropdown" class="z-50 hidden absolute right-0 top-full mt-2 bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44">
+                            <ul class="p-2 text-sm text-body font-medium" aria-labelledby="topStudentsDropdownButton">
+                                @foreach($rangeLabels as $range => $label)
+                                    <li><a href="{{ route('analytics', ['students_range' => $range, 'courses_range' => $courseRange]) }}" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">{{ $label }}</a></li>
+                                @endforeach
+                            </ul>
                         </div>
-                        <p class="text-sm text-body">Top Courses this month</p>
                     </div>
                 </div>
-
-                <div id="pie-chart" class="mb-4"></div>
-
-                <div class="flex justify-between items-center pt-4 border-t border-light">
-                    <button id="dropdownLastDays4Button" data-dropdown-toggle="LastDays4dropdown" data-dropdown-placement="bottom" class="text-sm font-medium text-body hover:text-heading inline-flex items-center" type="button">
-                        Last 7 days
-                        <svg class="w-4 h-4 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
-                    </button>
-                    <div id="LastDays4dropdown" class="z-10 hidden bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44">
-                        <ul class="p-2 text-sm text-body font-medium" aria-labelledby="dropdownLastDays4Button">
-                            <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Yesterday</a></li>
-                            <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Today</a></li>
-                            <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Last 7 days</a></li>
-                            <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Last 30 days</a></li>
-                            <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Last 90 days</a></li>
-                        </ul>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-        <div class="xl:col-span-1">
-            <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
-                <div class="flex justify-between items-start pb-4 mb-4 border-b border-light">
-                    <div>
-                        <div class="flex items-center mb-2">
-                            <div class="w-12 h-12 bg-neutral-primary-medium border border-default-medium flex items-center justify-center rounded-full me-3">
-                                <svg class="w-6 h-6 text-body" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M4.5 17H4a1 1 0 0 1-1-1 3 3 0 0 1 3-3h1m0-3.05A2.5 2.5 0 1 1 9 5.5M19.5 17h.5a1 1 0 0 0 1-1 3 3 0 0 0-3-3h-1m0-3.05a2.5 2.5 0 1 0-2-4.45m.5 13.5h-7a1 1 0 0 1-1-1 3 3 0 0 1 3-3h3a3 3 0 0 1 3 3 1 1 0 0 1-1 1Zm-1-9.5a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"/></svg>
-                            </div>
-
-                            <h5 class="text-2xl font-bold text-heading me-2">Student Distribution</h5>
-
-                            <svg data-popover-target="traffic-info" data-popover-placement="bottom" class="w-5 h-5 text-body hover:text-heading cursor-pointer" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.529 9.988a2.502 2.502 0 1 1 5 .191A2.441 2.441 0 0 1 12 12.582V14m-.01 3.008H12M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                            <div data-popover id="traffic-info" role="tooltip" class="absolute z-10 p-3 invisible inline-block text-sm text-body transition-opacity duration-300 bg-neutral-primary-soft border border-default rounded-base shadow-xs opacity-0 w-72">
-                                <div>
-                                    <h3 class="font-semibold text-heading mb-2">Student Distribution</h3>
-                                    <p class="mb-4">This chart shows the distribution of students across different categories in the library system.</p>
-                                </div>
-                                <div data-popper-arrow></div>
-                            </div>
-                        </div>
-                        <p class="text-sm text-body">Top Students this month</p>
-                    </div>
-                </div>
-
-                <div class="flex justify-between items-center mb-4">
-                <span class="text-body text-sm font-normal">Weekly Total Visitors</span>
-                <span class="text-heading text-lg font-semibold">#</span>
-                </div>
-
-                <div id="column-chart" class="mb-4"></div>
-
-                <div class="flex justify-between items-center pt-4 border-t border-light">
-                    <button id="dropdownLastDaysButton" data-dropdown-toggle="LastDaysdropdown" data-dropdown-placement="bottom" class="text-sm font-medium text-body hover:text-heading inline-flex items-center" type="button">
-                        Last 7 days
-                        <svg class="w-4 h-4 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
-                    </button>
-                    <div id="LastDaysdropdown" class="z-10 hidden bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44">
-                        <ul class="p-2 text-sm text-body font-medium" aria-labelledby="dropdownLastDaysButton">
-                        <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Yesterday</a></li>
-                        <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Today</a></li>
-                        <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Last 7 days</a></li>
-                        <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Last 30 days</a></li>
-                        <li><a href="#" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">Last 90 days</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @php
-    $appLabels = $topApps->pluck('app_name')->values()->all();
-    $appStats  = $topApps->pluck('total_seconds')->values()->all();
-    @endphp
-
-    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-12">
-        {{-- MOST USED APPS --}}
-        <div class="xl:col-span-1">
-            <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
-                <div class="flex justify-between items-start pb-4 mb-4 border-b border-light">
-                    <div>
-                        <h5 class="text-2xl font-bold text-heading">Most Used Apps</h5>
-                        <p class="text-sm text-body">Foreground usage time (from the kiosk)</p>
-                    </div>
-                </div>
-
-                <div id="apps-chart" class="mb-4"></div>
-
-                @if (count($appLabels) === 0)
-                    <p class="text-sm text-body">No usage data yet. Unlock a workstation and start using apps to record usage.</p>
-                @endif
-            </div>
-        </div>
-
-        {{-- TOP STUDENTS --}}
-        <div class="xl:col-span-1">
-            <div class="w-full bg-neutral-primary-soft border border-default rounded-lg shadow-xs p-6">
-                <div class="flex justify-between items-start pb-4 mb-4 border-b border-light">
-                    <div>
-                        <h5 class="text-2xl font-bold text-heading">Top Students this month</h5>
-                        <p class="text-sm text-body">By active usage time</p>
-                    </div>
-                </div>
-
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead>
-                            <tr class="border-b border-light text-xs font-semibold uppercase tracking-wide text-body">
-                                <th class="px-3 py-2">#</th>
-                                <th class="px-3 py-2">Student</th>
-                                <th class="px-3 py-2">Sessions</th>
-                                <th class="px-3 py-2">Time</th>
+                    <table class="w-full text-left text-sm text-gray-700">
+                        <thead class="bg-white uppercase text-black border-b border-gray-200">
+                            <tr>
+                                <th scope="col" class="px-5 py-5">#</th>
+                                <th scope="col" class="px-5 py-5">Student Name</th>
+                                <th scope="col" class="px-5 py-5 text-center">Access</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($topStudents as $i => $student)
-                                <tr class="border-b border-light/60">
-                                    <td class="px-3 py-2 text-body">{{ $i + 1 }}</td>
-                                    <td class="px-3 py-2 text-heading font-medium">{{ $student->student_name }}</td>
-                                    <td class="px-3 py-2 text-body">{{ $student->sessions }}</td>
-                                    <td class="px-3 py-2 text-body">{{ gmdate('H:i', $student->total_seconds) }}</td>
+                            @foreach($topStudents as $index => $student)
+                                <tr class="border-b border-gray-200">
+                                    <td class="px-5 py-5">{{ $index + 1 }}</td>
+                                    <td class="px-5 py-5">{{ $student->student_name }}</td>
+                                    <td class="px-5 py-5 text-center">{{ $student->total }}</td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-3 py-4 text-sm text-body">No usage data yet.</td>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 2: Top 10 Courses -->
+        <div class="rounded-lg border border-gray-200 bg-white">
+            <div>
+                <div class="w-full bg-neutral-primary-soft p-5 border-b border-light flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-black text-left uppercase">Top 10 Courses</h3>
+                    <div class="relative">
+                        <button id="topCoursesDropdownButton" data-dropdown-toggle="topCoursesDropdown" data-dropdown-placement="bottom" class="text-sm font-medium text-body hover:text-heading inline-flex items-center" type="button">
+                            {{ $courseRangeLabel }}
+                            <svg class="w-4 h-4 ms-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 9-7 7-7-7"/></svg>
+                        </button>
+                        <!-- Absolute placement and high z-index added -->
+                        <div id="topCoursesDropdown" class="z-50 hidden absolute right-0 top-full mt-2 bg-neutral-primary-medium border border-default-medium rounded-base shadow-lg w-44">
+                            <ul class="p-2 text-sm text-body font-medium" aria-labelledby="topCoursesDropdownButton">
+                                @foreach($rangeLabels as $range => $label)
+                                    <li><a href="{{ route('analytics', ['students_range' => $studentRange, 'courses_range' => $range]) }}" class="inline-flex items-center w-full p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded">{{ $label }}</a></li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm text-gray-700">
+                        <thead class="bg-white uppercase text-black border-b border-gray-200">
+                            <tr>
+                                <th scope="col" class="px-5 py-5">#</th>
+                                <th scope="col" class="px-5 py-2">Course Name</th>
+                                <th scope="col" class="px-5 py-5 text-center">Access</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($topCourses as $index => $course)
+                                <tr class="border-b border-gray-200">
+                                    <td class="px-5 py-5">{{ $index + 1 }}</td>
+                                    <td class="px-5 py-2">{{ $course->course }}</td>
+                                    <td class="px-5 py-5 text-center">{{ $course->total }}</td>
                                 </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -236,17 +164,8 @@
     </div>
 
 @endsection
-
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-    const courseLabels = @json($courseLabels);
-    const courseCounts = @json($courseCounts);
-    const maleData = @json($male);
-    const femaleData = @json($female);
-    const columnChartDays = @json($columnChartDays);
-    const appLabels = @json($appLabels);
-    const appStats  = @json($appStats);
-
     const getBrandTertiaryColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-fg-brand-strong').trim() || "#1E40AF";
     const getNeutralPrimaryColor = () => getComputedStyle(document.documentElement).getPropertyValue('--color-neutral-primary').trim() || "#FFFFFF";
     const brandTertiaryColor = getBrandTertiaryColor();
@@ -324,45 +243,6 @@
     if(document.getElementById("column-chart") && typeof ApexCharts !== 'undefined') {
         const columnChart = new ApexCharts(document.getElementById("column-chart"), columnChartOptions);
         columnChart.render();
-    }
-
-    /* ════════════ BAR Most Used Apps ════════════ */
-    const appChartOptions = {
-        series: [{
-            name: "Seconds",
-            data: appStats
-        }],
-        chart: {
-            type: "bar",
-            height: "320px",
-            fontFamily: "Inter, sans-serif",
-            toolbar: { show: false },
-        },
-        plotOptions: { bar: { horizontal: true, barHeight: "50%", borderRadiusApplication: "end", borderRadius: 6 } },
-        tooltip: { style: { fontFamily: "Inter, sans-serif" } },
-        stroke: { show: false },
-        grid: { show: true, strokeDashArray: 4, padding: { left: 2, right: 2, top: -14 } },
-        dataLabels: {
-            enabled: true,
-            textAnchor: "start",
-            style: { fontFamily: "Inter, sans-serif", fontWeight: 600, fontSize: "12px" },
-            offsetX: 6,
-            formatter: function (val) {
-                const m = Number(val) / 60;
-                return m < 60
-                    ? Math.round(m) + " min"
-                    : (m / 60).toFixed(1) + " hr";
-            }
-        },
-        colors: [getBrandTertiaryColor()],
-        xaxis: { labels: { show: false }, axisBorder: { show: false }, axisTicks: { show: false } },
-        yaxis: { labels: { show: true, style: { fontFamily: "Inter, sans-serif", cssClass: 'text-xs font-normal fill-body' } } }
-    };
-
-    if (document.getElementById("apps-chart") && typeof ApexCharts !== 'undefined' && appLabels.length > 0) {
-        appChartOptions.series[0].data = appLabels.map((label, i) => ({ x: label, y: appStats[i] }));
-        const appChart = new ApexCharts(document.getElementById("apps-chart"), appChartOptions);
-        appChart.render();
     }
     });
 </script>

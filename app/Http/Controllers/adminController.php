@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Device;
+use App\Models\DeviceWorkstation;
 use App\Models\PcAccessLogs;
 use App\Models\PcAppUsage;
 use App\Models\Workstations;
@@ -22,20 +23,24 @@ class AdminController extends Controller
         $totalWorkstations = Workstations::count();
         $activeWorkstations = Workstations::where('is_active', 1)->count();
 
-        
-        $slotUtilization = $totalWorkstations > 0 ? round(($activeWorkstations / $totalWorkstations) * 100) : 0;
+        // Each device provides two slots; each device-workstation mapping occupies one.
+        $totalSlots = $totalDevices * 2;
+        $occupiedSlots = DeviceWorkstation::count();
+        $slotUtilization = $totalSlots > 0 ? round(($occupiedSlots / $totalSlots) * 100) : 0;
 
-        // Weekly Visitors (unique student sessions in last 7 days)
-        $weeklyVisitors = PcAccessLogs::where('occurred_at', '>=', now()->subDays(7))
+        $weekStart = Carbon::today()->startOfWeek(Carbon::MONDAY);
+
+        // Weekly Visitors (unique student sessions from Monday through Sunday)
+        $weeklyVisitors = PcAccessLogs::where('occurred_at', '>=', $weekStart)
             ->distinct('student_external_id')->count('student_external_id');
 
-    
+
         $male = [];
         $female = [];
         $columnChartDays = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = Carbon::today()->subDays($i);
-            $columnChartDays[] = $date->format('D');
+        for ($i = 0; $i < 7; $i++) {
+            $date = $weekStart->copy()->addDays($i);
+            $columnChartDays[] = $date->format('l');
 
             $male[] = PcAccessLogs::whereDate('occurred_at', $date)
                 ->where('student_external_id', 'like', '%1')
@@ -48,7 +53,7 @@ class AdminController extends Controller
                 ->count('student_external_id');
         }
 
-    
+
         $courseDistribution = PcAccessLogs::selectRaw('course, COUNT(*) as count')
             ->groupBy('course')
             ->pluck('count', 'course')
@@ -121,7 +126,7 @@ class AdminController extends Controller
         // Top students by active usage time (usage joined to the time_in row).
         $topStudents = PcAppUsage::leftJoin('pc_access_logs as log', function ($join) {
                 $join->on('log.session_id', '=', 'pc_app_usage.session_id')
-                     ->where('log.event_type', 'time_in');
+                    ->where('log.event_type', 'time_in');
             })
             ->selectRaw('COALESCE(NULLIF(log.student_name, ""), "Unknown") as student_name')
             ->selectRaw('SUM(pc_app_usage.seconds) as total_seconds')

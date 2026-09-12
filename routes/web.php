@@ -1,10 +1,12 @@
 <?php
 
 use App\Http\Controllers\adminController as AdminController;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\WorkstationController;
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ReportsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/test-toast', function () {
@@ -23,13 +25,19 @@ Route::get('/', function () {
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard',[AdminController::class,'dashboard'])->name('dashboard');
-    Route::get('/analytics',[AdminController::class,'analytics'])->name('analytics');
-    Route::get('/reports',[AdminController::class,'reports'])->name('reports');
+    Route::get('/analytics',[AnalyticsController::class,'index'])->name('analytics');
+    Route::get('/reports',[ReportsController::class,'index'])->name('reports');
+    Route::get('/reports/csv',[ReportsController::class,'exportCsv'])->name('reports.csv');
+    Route::get('/reports/preview-pdf', [ReportsController::class, 'previewPdf'])->name('reports.preview');
+    Route::get('/reports/pdf',[ReportsController::class,'exportPdf'])->name('reports.pdf');
     // Workstation  Routes
     Route::get('/workstation',[WorkstationController::class,'index'])->name('workstation');
     Route::get('/workstation/add',[WorkstationController::class,'create'])->name('workstation.create');
     Route::post('/workstation/add',[WorkstationController::class,'store'])->name('workstation.store');
     Route::get('/workstation/{workstation}',[WorkstationController::class,'show'])->name('workstation.view');
+    Route::get('/workstation/{workstation}/edit',[WorkstationController::class,'edit'])->name('workstation.edit');
+    Route::put('/workstation/{workstation}/update',[WorkstationController::class,'update'])->name('workstation.update');
+    Route::delete('/workstation/{workstation}/delete',[WorkstationController::class,'destroy'])->name('workstation.destroy');
     // Device Route
     Route::get('/device',[DeviceController::class,'index'])->name('device');
     Route::get('/device/add',[DeviceController::class,'create'])->name('device.create');
