@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\PcAccessLogs;
-use App\Models\Workstations;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
@@ -81,12 +80,12 @@ class PcAccessLogSeeder extends Seeder
                 'BS in Mechanical Engineering',
                 'BS in Computer Engineering',
                 'BS in Electrical Engineering',
-                'Bachelor of Industrial Technology Major in Automotive',
-                'Bachelor of Industrial Technology Major in Drafting',
-                'Bachelor of Industrial Technology Major in Electrical',
-                'Bachelor of Industrial Technology Major in Electronics',
-                'Bachelor of Industrial Technology Major in Food Preparation & Services',
-                'Bachelor of Industrial Technology Major in HVAC',
+                'BIT Major in Automotive',
+                'BIT Major in Drafting',
+                'BIT Major in Electrical',
+                'BIT Major in Electronics',
+                'BIT Major in Food Preparation & Services',
+                'BIT Major in HVAC',
                 'BS in Information Technology Major in Networking',
                 'BS in Information Technology Major in Programming',
                 'Bachelor of Elementary Education (BEEd)',
@@ -113,11 +112,11 @@ class PcAccessLogSeeder extends Seeder
         
 
     
-        $workstationIds = Workstations::pluck('id')->toArray();
+        $deviceIds = \App\Models\Device::pluck('id')->toArray();
 
        
-        $startDate = Carbon::create(2026, 9,7 )->startOfDay();
-        $endDate = Carbon::create(2026, 9, 12)->endOfDay();
+        $startDate = Carbon::create(2026, 9,13 )->startOfDay();
+        $endDate = Carbon::create(2026, 9, 20)->endOfDay();
 
         for ($date = $startDate->copy(); $date->lte($endDate); $date->addDay()) {
             
@@ -127,7 +126,7 @@ class PcAccessLogSeeder extends Seeder
                 [$studentId, $last, $first, $middle] = $student;
                 $studentName = trim("$first $middle $last");
 
-                $workstation_id = $workstationIds[array_rand($workstationIds)];
+                $device_id = $deviceIds[array_rand($deviceIds)];
                 $course = $courses[array_rand($courses)];
 
                 $occurredAt = Carbon::instance(
@@ -142,7 +141,7 @@ class PcAccessLogSeeder extends Seeder
                     'occurred_at'          => $occurredAt,
                     'received_at'          => $receivedAt,
                     'rfid_uid'             => 'RFID' . rand(1000,9999),
-                    'workstation_id'       => $workstation_id,
+                    'device_id'            => $device_id,
                     'event_type'           => 'LOGIN',
                     'result'               => rand(0, 9) > 0 ? 'SUCCESS' : 'FAIL',
                     'reason'               => 'Authorized',
