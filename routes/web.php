@@ -68,6 +68,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/dashboard/sessions/{sessionId}/force-end', [AdminController::class, 'forceEndSession'])->name('dashboard.session.force-end');
 
     Route::get('/devices',[DeviceController::class,'index'])->name('device');
+    Route::post('/devices/bulk/lock', [DeviceController::class, 'bulkLock'])->name('device.bulk-lock');
+    Route::post('/devices/bulk/announce', [DeviceController::class, 'bulkAnnounce'])->name('device.bulk-announce');
+    Route::delete('/devices/bulk/delete', [DeviceController::class, 'bulkDestroy'])->name('device.bulk-delete');
     Route::get('/devices/{device}', [DeviceController::class, 'show'])->name('device.show');
     Route::delete('/devices/{device}/delete', [DeviceController::class, 'destroy'])->name('device.destroy');
     Route::post('/devices/{device}/lock', [DeviceController::class, 'lockDevice'])->name('device.lock');

@@ -96,6 +96,34 @@
         </div>
     </div>
 
+    {{-- Bulk actions --}}
+    <div id="bulk-actions-bar" class="mb-4 hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="text-sm font-medium text-slate-700">
+                <span id="bulk-selected-count">0</span> selected
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <button type="button" id="bulk-lock-btn" class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-100">
+                    <x-icon name="lock" class="h-4 w-4" />
+                    Remote Lock
+                </button>
+                <button type="button" id="bulk-announce-btn" class="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-700 transition hover:bg-sky-100">
+                    <x-icon name="megaphone-a" class="h-4 w-4" />
+                    Announce
+                </button>
+                @if(auth()->user()->isSuperAdmin())
+                <button type="button" id="bulk-delete-btn" class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100">
+                    <x-icon name="trash" class="h-4 w-4" />
+                    Delete
+                </button>
+                @endif
+                <button type="button" id="bulk-clear-btn" class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                    Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
     {{-- Devices Table --}}
     <div class="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
 
@@ -127,13 +155,19 @@
             <table class="w-full text-left text-sm text-slate-600">
                 <thead class="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wider text-slate-500">
                     <tr>
-                        <th scope="col" class="px-6 py-4 font-semibold sm:px-8">
+                        <th scope="col" class="px-4 py-4 sm:px-6">
+                            <input id="select-all-devices" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" title="Select all on this page">
+                        </th>
+                        <th scope="col" class="px-4 py-4 font-semibold sm:px-6">
                             Workstation Name
                         </th>
-                        <th scope="col" class="px-6 py-4 text-center font-semibold">
-                            Status
+                        <th scope="col" class="px-4 py-4 text-center font-semibold">
+                            Pairing
                         </th>
-                        <th scope="col" class="px-6 py-4 text-center font-semibold sm:px-8">
+                        <th scope="col" class="px-4 py-4 text-center font-semibold">
+                            Activity
+                        </th>
+                        <th scope="col" class="px-4 py-4 text-center font-semibold sm:px-6">
                             Actions
                         </th>
                     </tr>
@@ -141,23 +175,30 @@
 
                 <tbody class="divide-y divide-slate-100">
                     @forelse($devices as $device)
+                        @php
+                            $inUse = isset($inUseDeviceIds) && $inUseDeviceIds->contains($device->id);
+                        @endphp
                         <tr class="group bg-white transition-colors hover:bg-blue-50/30">
-
-                           
+                            <td class="px-4 py-5 sm:px-6">
+                                <input type="checkbox" class="device-select h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="{{ $device->id }}" data-name="{{ $device->workstation_name }}">
+                            </td>
 
                             {{-- Workstation --}}
-                            <td class="px-6 py-5 sm:px-8">
+                            <td class="px-4 py-5 sm:px-6">
                                 <p class="font-semibold text-slate-800">
                                     {{ $device->workstation_name }}
                                 </p>
 
                                 <p class="mt-0.5 text-xs text-slate-400">
                                     Workstation
+                                    @if($device->last_seen_at)
+                                        · Last seen {{ $device->last_seen_at->diffForHumans() }}
+                                    @endif
                                 </p>
                             </td>
 
-                            {{-- Status --}}
-                            <td class="px-6 py-5 text-center">
+                            {{-- Pairing Status --}}
+                            <td class="px-4 py-5 text-center">
                                 @if($device->is_paired)
                                     <span class="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
                                         <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
@@ -171,8 +212,23 @@
                                 @endif
                             </td>
 
+                            {{-- Activity Status --}}
+                            <td class="px-4 py-5 text-center">
+                                @if($inUse)
+                                    <span class="inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700" title="A session is currently logged in on this device">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span>
+                                        In Use
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600" title="No active session logged in">
+                                        <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                                        Offline
+                                    </span>
+                                @endif
+                            </td>
+
                             {{-- Actions --}}
-                            <td class="px-6 py-5 sm:px-8">
+                            <td class="px-4 py-5 sm:px-6">
                                 <div class="flex items-center justify-center">
 
                                     <button
@@ -203,7 +259,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="px-6 py-20 text-center">
+                            <td colspan="5" class="px-6 py-20 text-center">
                                 <div class="mx-auto flex max-w-sm flex-col items-center">
                                     <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
                                         <x-icon name="wifi" class="h-8 w-8" />
@@ -335,28 +391,17 @@
     <script>
         (function () {
 
-            const menuEl =
-                document.getElementById('device-actions-menu');
-
-            const titleEl =
-                document.getElementById('device-actions-menu-title');
-
-            const viewEl =
-                document.getElementById('device-menu-view');
-
-            const editEl =
-                document.getElementById('device-menu-edit');
-
+            const menuEl = document.getElementById('device-actions-menu');
+            const titleEl = document.getElementById('device-actions-menu-title');
+            const viewEl = document.getElementById('device-menu-view');
+            const editEl = document.getElementById('device-menu-edit');
             let activeButton = null;
-
 
             if (!menuEl) {
                 return;
             }
 
-
             function closeMenu() {
-
                 if (menuEl.classList.contains('hidden')) {
                     return;
                 }
@@ -367,12 +412,9 @@
                     activeButton.setAttribute('aria-expanded', 'false');
                     activeButton = null;
                 }
-
             }
 
-
             function positionMenu(button) {
-
                 const rect = button.getBoundingClientRect();
                 const gap = 8;
 
@@ -394,12 +436,9 @@
 
                 menuEl.style.left = Math.max(gap, left) + 'px';
                 menuEl.style.top = Math.max(gap, top) + 'px';
-
             }
 
-
             function openMenu(button) {
-
                 if (activeButton === button) {
                     closeMenu();
                     return;
@@ -407,155 +446,190 @@
 
                 closeMenu();
 
-                titleEl.textContent =
-                    button.getAttribute('data-device-name') || 'Device';
+                titleEl.textContent = button.getAttribute('data-device-name') || 'Device';
 
                 if (viewEl) {
-                    viewEl.href =
-                        button.getAttribute('data-view-url') || '#';
+                    viewEl.href = button.getAttribute('data-view-url') || '#';
                 }
 
                 if (editEl) {
-                    editEl.href =
-                        button.getAttribute('data-edit-url') || '#';
+                    editEl.href = button.getAttribute('data-edit-url') || '#';
                 }
 
-                menuEl.dataset.lockUrl =
-                    button.getAttribute('data-lock-url') || '';
-
-                menuEl.dataset.announceUrl =
-                    button.getAttribute('data-announce-url') || '';
-
-                menuEl.dataset.deleteUrl =
-                    button.getAttribute('data-delete-url') || '';
-
-                menuEl.dataset.deleteMessage =
-                    button.getAttribute('data-delete-message') || '';
-
-                menuEl.dataset.deviceName =
-                    button.getAttribute('data-device-name') || 'this PC';
+                menuEl.dataset.lockUrl = button.getAttribute('data-lock-url') || '';
+                menuEl.dataset.announceUrl = button.getAttribute('data-announce-url') || '';
+                menuEl.dataset.deleteUrl = button.getAttribute('data-delete-url') || '';
+                menuEl.dataset.deleteMessage = button.getAttribute('data-delete-message') || '';
+                menuEl.dataset.deviceName = button.getAttribute('data-device-name') || 'this PC';
 
                 activeButton = button;
-
                 button.setAttribute('aria-expanded', 'true');
-
                 positionMenu(button);
-
             }
 
-
             document.addEventListener('click', function (event) {
-
                 const button = event.target.closest('.device-manage');
-
                 if (!button) {
                     return;
                 }
-
                 event.stopPropagation();
-
                 openMenu(button);
-
             });
 
+            menuEl.querySelector('.device-menu-lock')?.addEventListener('click', function () {
+                const url = menuEl.dataset.lockUrl;
+                const deviceName = menuEl.dataset.deviceName;
+                closeMenu();
+                if (!url || typeof openRemoteLockModal !== 'function') {
+                    return;
+                }
+                openRemoteLockModal(url, deviceName);
+            });
 
-            menuEl.querySelector('.device-menu-lock')
-                .addEventListener('click', function () {
+            menuEl.querySelector('.device-menu-announce')?.addEventListener('click', function () {
+                const url = menuEl.dataset.announceUrl;
+                const deviceName = menuEl.dataset.deviceName;
+                closeMenu();
+                if (!url || typeof openRemoteAnnounceModal !== 'function') {
+                    return;
+                }
+                openRemoteAnnounceModal(url, deviceName);
+            });
 
-                    const url = menuEl.dataset.lockUrl;
-                    const deviceName = menuEl.dataset.deviceName;
-
-                    closeMenu();
-
-                    if (!url || typeof openRemoteLockModal !== 'function') {
-                        return;
-                    }
-
-                    openRemoteLockModal(url, deviceName);
-
-                });
-
-
-            menuEl.querySelector('.device-menu-announce')
-                .addEventListener('click', function () {
-
-                    const url = menuEl.dataset.announceUrl;
-                    const deviceName = menuEl.dataset.deviceName;
-
-                    closeMenu();
-
-                    if (!url || typeof openRemoteAnnounceModal !== 'function') {
-                        return;
-                    }
-
-                    openRemoteAnnounceModal(url, deviceName);
-
-                });
-
-
-            const deleteEl =
-                menuEl.querySelector('.device-menu-delete');
-
+            const deleteEl = menuEl.querySelector('.device-menu-delete');
             if (deleteEl) {
-
                 deleteEl.addEventListener('click', function () {
-
                     const url = menuEl.dataset.deleteUrl;
                     const message = menuEl.dataset.deleteMessage;
-
                     closeMenu();
-
                     if (!url || typeof openDeleteModal !== 'function') {
                         return;
                     }
-
                     openDeleteModal(url, message);
-
                 });
-
             }
 
-
             [viewEl, editEl].forEach(function (link) {
-
                 if (link) {
                     link.addEventListener('click', closeMenu);
                 }
-
             });
 
-
             document.addEventListener('click', function (event) {
-
                 if (menuEl.classList.contains('hidden')) {
                     return;
                 }
-
                 if (menuEl.contains(event.target)) {
                     return;
                 }
-
                 if (event.target.closest('.device-manage')) {
                     return;
                 }
-
                 closeMenu();
-
             });
 
-
             document.addEventListener('keydown', function (event) {
-
                 if (event.key === 'Escape') {
                     closeMenu();
                 }
-
             });
-
 
             window.addEventListener('scroll', closeMenu, true);
             window.addEventListener('resize', closeMenu);
 
+            // ---- Bulk selection & actions ----
+            const selectAll = document.getElementById('select-all-devices');
+            const rowChecks = Array.from(document.querySelectorAll('.device-select'));
+            const bar = document.getElementById('bulk-actions-bar');
+            const countEl = document.getElementById('bulk-selected-count');
+            const bulkLockBtn = document.getElementById('bulk-lock-btn');
+            const bulkAnnounceBtn = document.getElementById('bulk-announce-btn');
+            const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+            const clearBtn = document.getElementById('bulk-clear-btn');
+
+            function getSelected() {
+                return rowChecks.filter(cb => cb.checked).map(cb => ({
+                    id: cb.value,
+                    name: cb.getAttribute('data-name') || 'Device'
+                }));
+            }
+
+            function updateBulkUi() {
+                const selected = getSelected();
+                const count = selected.length;
+
+                if (countEl) countEl.textContent = String(count);
+                if (bar) bar.classList.toggle('hidden', count === 0);
+
+                if (selectAll) {
+                    if (count === 0) {
+                        selectAll.checked = false;
+                        selectAll.indeterminate = false;
+                    } else if (count === rowChecks.length && rowChecks.length > 0) {
+                        selectAll.checked = true;
+                        selectAll.indeterminate = false;
+                    } else {
+                        selectAll.checked = false;
+                        selectAll.indeterminate = true;
+                    }
+                }
+            }
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function () {
+                    rowChecks.forEach(cb => { cb.checked = selectAll.checked; });
+                    updateBulkUi();
+                });
+            }
+
+            rowChecks.forEach(cb => cb.addEventListener('change', updateBulkUi));
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function () {
+                    rowChecks.forEach(cb => { cb.checked = false; });
+                    if (selectAll) { selectAll.checked = false; selectAll.indeterminate = false; }
+                    updateBulkUi();
+                });
+            }
+
+            function selectedIds(selected) {
+                return selected.map(s => s.id);
+            }
+
+            function selectedLabel(selected) {
+                if (selected.length === 1) return selected[0].name;
+                return selected.length + ' selected devices';
+            }
+
+            if (bulkLockBtn) {
+                bulkLockBtn.addEventListener('click', function () {
+                    const selected = getSelected();
+                    if (selected.length === 0 || typeof openRemoteLockModal !== 'function') return;
+                    openRemoteLockModal(@json(route('device.bulk-lock')), selectedLabel(selected), selectedIds(selected));
+                });
+            }
+
+            if (bulkAnnounceBtn) {
+                bulkAnnounceBtn.addEventListener('click', function () {
+                    const selected = getSelected();
+                    if (selected.length === 0 || typeof openRemoteAnnounceModal !== 'function') return;
+                    openRemoteAnnounceModal(@json(route('device.bulk-announce')), selectedLabel(selected), selectedIds(selected));
+                });
+            }
+
+            if (bulkDeleteBtn) {
+                bulkDeleteBtn.addEventListener('click', function () {
+                    const selected = getSelected();
+                    if (selected.length === 0 || typeof openDeleteModal !== 'function') return;
+                    openDeleteModal(
+                        @json(route('device.bulk-delete')),
+                        'Are you sure you want to delete ' + selected.length + ' selected device(s)? This action cannot be undone.',
+                        selectedIds(selected)
+                    );
+                });
+            }
+
+            updateBulkUi();
         })();
     </script>
 

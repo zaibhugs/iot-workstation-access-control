@@ -15,26 +15,31 @@ class DeviceController extends Controller
 
     public function index(Request $request)
     {
-        
         $query = Device::query();
 
         if ($request->filled('search')) {
             $search = $request->input('search');
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('workstation_name', 'like', "%{$search}%");
-                
             });
         }
-
 
         if ($request->filled('status')) {
             $status = $request->input('status') === 'paired' ? 1 : 0;
             $query->where('is_paired', $status);
         }
+
         $devices = $query->latest()->paginate(5)->withQueryString();
 
-    
-        return view('admin.device.index', compact('devices'));
+        $inUseDeviceIds = collect();
+        if ($devices->count() > 0) {
+            $inUseDeviceIds = $this->sessions->openSessionsQuery()
+                ->whereIn('pc_access_logs.device_id', $devices->pluck('id'))
+                ->distinct()
+                ->pluck('pc_access_logs.device_id');
+        }
+
+        return view('admin.device.index', compact('devices', 'inUseDeviceIds'));
     }
 
     public function create(){
@@ -175,5 +180,90 @@ public function show(Device $device ){
 
         return redirect()->back()->with('success', "Announcement sent to '{$name}'. It will display on the PC within a few seconds if online.");
     }
-    
+
+    public function bulkLock(Request $request)
+    {
+        $validated = $request->validate([
+            'device_ids' => 'required|array|min:1',
+            'device_ids.*' => 'integer|exists:devices,id',
+            'message' => 'nullable|string|max:500',
+        ]);
+
+        $devices = Device::whereIn('id', $validated['device_ids'])->get();
+        $locked = 0;
+        $closedSessions = 0;
+
+        foreach ($devices as $device) {
+            $closedSessions += $this->sessions->closeOpenSessionsForDevice(
+                $device->id,
+                'Remote lock by staff',
+                SessionService::ENDED_BY_ADMIN
+            );
+
+            $device->remoteCommands()->create([
+                'command' => 'lock',
+                'message' => trim($validated['message'] ?? '') ?: null,
+                'status'  => 'pending',
+            ]);
+
+            $locked++;
+        }
+
+        return redirect()->back()->with('success', "Remote lock sent to {$locked} device(s). {$closedSessions} open session(s) closed.");
+    }
+
+    public function bulkAnnounce(Request $request)
+    {
+        $validated = $request->validate([
+            'device_ids' => 'required|array|min:1',
+            'device_ids.*' => 'integer|exists:devices,id',
+            'message' => 'required|string|max:500',
+        ]);
+
+        $devices = Device::whereIn('id', $validated['device_ids'])->get();
+        $count = 0;
+
+        foreach ($devices as $device) {
+            $device->remoteCommands()->create([
+                'command' => 'announcement',
+                'message' => trim($validated['message']),
+                'status'  => 'pending',
+            ]);
+            $count++;
+        }
+
+        return redirect()->back()->with('success', "Announcement sent to {$count} device(s).");
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        if (!auth()->user() || !auth()->user()->isSuperAdmin()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'device_ids' => 'required|array|min:1',
+            'device_ids.*' => 'integer|exists:devices,id',
+        ]);
+
+        $devices = Device::whereIn('id', $validated['device_ids'])->get();
+        $deleted = 0;
+
+        foreach ($devices as $device) {
+            try {
+                $this->sessions->closeOpenSessionsForDevice(
+                    $device->id,
+                    'Device deleted by admin',
+                    SessionService::ENDED_BY_ADMIN
+                );
+            } catch (\Throwable $e) {
+                // Best effort.
+            }
+
+            $device->delete();
+            $deleted++;
+        }
+
+        return redirect()->back()->with('success', "{$deleted} device(s) deleted.");
+    }
 }
