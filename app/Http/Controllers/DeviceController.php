@@ -235,6 +235,46 @@ public function show(Device $device ){
         return redirect()->back()->with('success', "Announcement sent to {$count} device(s).");
     }
 
+    public function unlockDevice(Request $request, Device $device)
+    {
+        $validated = $request->validate([
+            'message' => 'nullable|string|max:500',
+        ]);
+
+        $device->remoteCommands()->create([
+            'command' => 'unlock',
+            'message' => trim($validated['message'] ?? '') ?: null,
+            'status'  => 'pending',
+        ]);
+
+        $name = $device->workstation_name;
+
+        return redirect()->back()->with('success', "Remote unlock command sent to '{$name}'. It will unlock on the PC's next check (within a few seconds if online). No student session will be started.");
+    }
+
+    public function bulkUnlock(Request $request)
+    {
+        $validated = $request->validate([
+            'device_ids' => 'required|array|min:1',
+            'device_ids.*' => 'integer|exists:devices,id',
+            'message' => 'nullable|string|max:500',
+        ]);
+
+        $devices = Device::whereIn('id', $validated['device_ids'])->get();
+        $count = 0;
+
+        foreach ($devices as $device) {
+            $device->remoteCommands()->create([
+                'command' => 'unlock',
+                'message' => trim($validated['message'] ?? '') ?: null,
+                'status'  => 'pending',
+            ]);
+            $count++;
+        }
+
+        return redirect()->back()->with('success', "Remote unlock sent to {$count} device(s). No student sessions were started.");
+    }
+
     public function bulkDestroy(Request $request)
     {
         if (!auth()->user() || !auth()->user()->isSuperAdmin()) {

@@ -97,27 +97,32 @@
     </div>
 
     {{-- Bulk actions --}}
-    <div id="bulk-actions-bar" class="mb-4 hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4">
+    <div id="bulk-actions-bar" class="mb-4 hidden rounded-2xl border border-blue-200 bg-blue-50/60 p-3 shadow-sm sm:p-4">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div class="text-sm font-medium text-slate-700">
-                <span id="bulk-selected-count">0</span> selected
+            <div class="flex items-center gap-2">
+                <span class="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-blue-600 px-2 text-xs font-bold text-white" id="bulk-selected-count">0</span>
+                <span class="text-sm font-semibold text-slate-800">device(s) selected</span>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <button type="button" id="bulk-lock-btn" class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-700 transition hover:bg-amber-100">
+                <button type="button" id="bulk-lock-btn" class="inline-flex items-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-amber-600 focus:outline-none focus:ring-4 focus:ring-amber-200">
                     <x-icon name="lock" class="h-4 w-4" />
                     Remote Lock
                 </button>
-                <button type="button" id="bulk-announce-btn" class="inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-sm font-semibold text-sky-700 transition hover:bg-sky-100">
+                <button type="button" id="bulk-unlock-btn" class="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-4 focus:ring-emerald-200">
+                    <x-icon name="lock-open" class="h-4 w-4" />
+                    Remote Unlock
+                </button>
+                <button type="button" id="bulk-announce-btn" class="inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-200">
                     <x-icon name="megaphone-a" class="h-4 w-4" />
                     Announce
                 </button>
                 @if(auth()->user()->isSuperAdmin())
-                <button type="button" id="bulk-delete-btn" class="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-100">
+                <button type="button" id="bulk-delete-btn" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200">
                     <x-icon name="trash" class="h-4 w-4" />
                     Delete
                 </button>
                 @endif
-                <button type="button" id="bulk-clear-btn" class="inline-flex items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">
+                <button type="button" id="bulk-clear-btn" class="inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-4 focus:ring-gray-200">
                     Clear
                 </button>
             </div>
@@ -156,7 +161,7 @@
                 <thead class="border-b border-slate-100 bg-slate-50/70 text-xs uppercase tracking-wider text-slate-500">
                     <tr>
                         <th scope="col" class="px-4 py-4 sm:px-6">
-                            <input id="select-all-devices" type="checkbox" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" title="Select all on this page">
+                            <input id="select-all-devices" type="checkbox" class="h-4 w-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500" title="Select all on this page">
                         </th>
                         <th scope="col" class="px-4 py-4 font-semibold sm:px-6">
                             Workstation Name
@@ -180,7 +185,7 @@
                         @endphp
                         <tr class="group bg-white transition-colors hover:bg-blue-50/30">
                             <td class="px-4 py-5 sm:px-6">
-                                <input type="checkbox" class="device-select h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500" value="{{ $device->id }}" data-name="{{ $device->workstation_name }}">
+                                <input type="checkbox" class="device-select h-4 w-4 cursor-pointer rounded border-gray-300 bg-gray-100 text-blue-600 focus:ring-2 focus:ring-blue-500" value="{{ $device->id }}" data-name="{{ $device->workstation_name }}">
                             </td>
 
                             {{-- Workstation --}}
@@ -237,6 +242,7 @@
                                         data-device-name="{{ $device->workstation_name }}"
                                         data-view-url="{{ route('device.show', $device->id) }}"
                                         data-lock-url="{{ route('device.lock', $device->id) }}"
+                                        data-unlock-url="{{ route('device.unlock', $device->id) }}"
                                         data-announce-url="{{ route('device.announce', $device->id) }}"
                                         @if(auth()->user()->isSuperAdmin())
                                             data-edit-url="{{ route('device.edit', $device->id) }}"
@@ -334,6 +340,17 @@
             <x-icon name="lock" class="h-4 w-4" aria-hidden="true" />
 
             Remote Lock
+        </button>
+
+
+        <button
+            type="button"
+            class="device-menu-unlock flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-emerald-50 hover:text-emerald-700"
+            role="menuitem"
+        >
+            <x-icon name="lock-open" class="h-4 w-4" aria-hidden="true" />
+
+            Remote Unlock
         </button>
 
 
@@ -457,6 +474,7 @@
                 }
 
                 menuEl.dataset.lockUrl = button.getAttribute('data-lock-url') || '';
+                menuEl.dataset.unlockUrl = button.getAttribute('data-unlock-url') || '';
                 menuEl.dataset.announceUrl = button.getAttribute('data-announce-url') || '';
                 menuEl.dataset.deleteUrl = button.getAttribute('data-delete-url') || '';
                 menuEl.dataset.deleteMessage = button.getAttribute('data-delete-message') || '';
@@ -484,6 +502,16 @@
                     return;
                 }
                 openRemoteLockModal(url, deviceName);
+            });
+
+            menuEl.querySelector('.device-menu-unlock')?.addEventListener('click', function () {
+                const url = menuEl.dataset.unlockUrl;
+                const deviceName = menuEl.dataset.deviceName;
+                closeMenu();
+                if (!url || typeof openRemoteUnlockModal !== 'function') {
+                    return;
+                }
+                openRemoteUnlockModal(url, deviceName);
             });
 
             menuEl.querySelector('.device-menu-announce')?.addEventListener('click', function () {
@@ -543,6 +571,7 @@
             const bar = document.getElementById('bulk-actions-bar');
             const countEl = document.getElementById('bulk-selected-count');
             const bulkLockBtn = document.getElementById('bulk-lock-btn');
+            const bulkUnlockBtn = document.getElementById('bulk-unlock-btn');
             const bulkAnnounceBtn = document.getElementById('bulk-announce-btn');
             const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
             const clearBtn = document.getElementById('bulk-clear-btn');
@@ -609,6 +638,14 @@
                 });
             }
 
+            if (bulkUnlockBtn) {
+                bulkUnlockBtn.addEventListener('click', function () {
+                    const selected = getSelected();
+                    if (selected.length === 0 || typeof openRemoteUnlockModal !== 'function') return;
+                    openRemoteUnlockModal(@json(route('device.bulk-unlock')), selectedLabel(selected), selectedIds(selected));
+                });
+            }
+
             if (bulkAnnounceBtn) {
                 bulkAnnounceBtn.addEventListener('click', function () {
                     const selected = getSelected();
@@ -635,6 +672,7 @@
 
 
     <x-remote-lock-modal />
+    <x-remote-unlock-modal />
     <x-remote-announce-modal />
     
     <x-error-modal />
