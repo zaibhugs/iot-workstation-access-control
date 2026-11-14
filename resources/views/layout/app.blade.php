@@ -22,7 +22,7 @@
 
 
     <title>
-        @yield('title', 'Dashboard') | OLH
+        @yield('title', 'Dashboard') | Open Learning Hub
     </title>
 
 
@@ -95,7 +95,7 @@
                             <p
                                 class="text-base font-bold tracking-tight text-gray-900"
                             >
-                                OLH
+                                Open Learning Hub
                             </p>
 
 
@@ -649,7 +649,7 @@
                             <p
                                 class="text-xs font-semibold text-gray-800"
                             >
-                                OLH Library
+                                Open Learning Hub
                             </p>
 
 
