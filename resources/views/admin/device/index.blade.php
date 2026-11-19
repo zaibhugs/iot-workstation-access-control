@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="min-h-full bg-slate-50/70">
-    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 md:pb-6 lg:px-8">
 
     {{-- Page Header --}}
     <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -24,17 +24,25 @@
             </p>
         </div>
         
-        {{-- Add Device --}}
+        {{-- Add Device (desktop button; mobile uses the floating button) --}}
         @if(auth()->user()->isSuperAdmin())
         <a
             href="{{ route('device.create') }}"
-            class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200"
+            class="hidden h-11 items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200 md:inline-flex"
         >
             <x-icon name="plus" class="h-4.5 w-4.5" aria-hidden="true" />
             Add Device
         </a>
         @endif
     </div>
+
+    {{-- Add Device (mobile only) --}}
+    @if(auth()->user()->isSuperAdmin())
+        <x-mobile-fab
+            :href="route('device.create')"
+            label="Add Device"
+        />
+    @endif
 
     {{-- Filters --}}
     <div class="mb-6 rounded-3xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
@@ -86,7 +94,7 @@
                     id="status"
                     name="status"
                     onchange="this.form.submit()"
-                    class="block h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
+                    class="filter-select block h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 text-sm font-medium text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
                 >
                     <option value="">All Status</option>
                     <option value="paired" @selected(request('status') === 'paired')>Paired</option>

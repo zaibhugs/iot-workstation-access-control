@@ -72,7 +72,7 @@
             <select
                 id="course"
                 name="course"
-                class="block h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                class="filter-select block h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
             >
                 <option value="">All courses</option>
 
@@ -96,7 +96,7 @@
             <select
                 id="device"
                 name="device"
-                class="block h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                class="filter-select block h-11 w-full rounded-xl border border-gray-200 bg-gray-50 px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
             >
                 <option value="">All computers</option>
 
@@ -155,7 +155,7 @@
                         Event
                     </label>
 
-                    <select id="event" name="event" class="block h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50">
+                    <select id="event" name="event" class="filter-select block h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50">
                         <option value="">All events</option>
 
                         @foreach ($events as $event)
@@ -175,7 +175,7 @@
                         Result
                     </label>
 
-                    <select id="result" name="result" class="block h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50">
+                    <select id="result" name="result" class="filter-select block h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50">
                         <option value="">All results</option>
 
                         @foreach ($results as $result)
@@ -195,7 +195,7 @@
                         Reason
                     </label>
 
-                    <select id="reason" name="reason" class="block h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50">
+                    <select id="reason" name="reason" class="filter-select block h-11 w-full rounded-xl border border-gray-200 bg-white px-3.5 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50">
                         <option value="">All reasons</option>
 
                         @foreach ($reasons as $reason)

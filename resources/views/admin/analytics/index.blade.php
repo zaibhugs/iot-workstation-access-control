@@ -57,12 +57,37 @@
                     <x-icon name="chevron-down" class="h-4 w-4" aria-hidden="true" />
                 </button>
 
+                {{-- Mobile backdrop for the filter sheet --}}
+                <div
+                    id="overview-filter-backdrop"
+                    class="fixed inset-0 z-[64] hidden bg-gray-900/40 md:hidden"
+                    aria-hidden="true"
+                ></div>
+
                 <form
                     id="overview-filter-panel"
                     method="GET"
                     action="{{ route('analytics') }}"
-                    class="absolute right-0 z-30 mt-2 hidden w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200 bg-white p-5 shadow-lg"
+                    class="absolute right-0 z-30 mt-2 hidden w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-slate-200 bg-white p-5 shadow-lg
+                    max-md:fixed max-md:inset-x-0 max-md:bottom-0 max-md:top-auto max-md:mt-0 max-md:z-[65]
+                    max-md:max-h-[85vh] max-md:w-full max-md:max-w-none max-md:overflow-y-auto
+                    max-md:rounded-t-3xl max-md:border-b-0 max-md:p-5
+                    max-md:pb-[calc(1.25rem+env(safe-area-inset-bottom))] max-md:shadow-2xl"
                 >
+                    {{-- Mobile drag handle + close --}}
+                    <div class="mb-3 flex justify-center md:hidden">
+                        <span class="h-1 w-10 rounded-full bg-gray-200"></span>
+                    </div>
+
+                    <button
+                        type="button"
+                        data-overview-filter-close
+                        class="absolute right-4 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-gray-400 transition active:bg-gray-100 md:hidden"
+                        aria-label="Close filters"
+                    >
+                        <x-icon name="cancel" class="h-5 w-5" />
+                    </button>
+
                     <div class="space-y-4">
                         <div>
                             <label for="date_from" class="mb-2 block text-xs font-semibold text-gray-600">
@@ -315,33 +340,65 @@ document.addEventListener('DOMContentLoaded', function () {
     const dateRange = @json($rangeLabel);
 
     // ===== Dropdown helper =====
-    const setupDropdown = (toggle, panel) => {
+    // An optional backdrop turns the panel into a mobile bottom sheet.
+    const setupDropdown = (toggle, panel, backdrop = null) => {
         if (!toggle || !panel) {
-            return;
+            return () => {};
         }
+
+        const close = () => {
+            panel.classList.add('hidden');
+            toggle.setAttribute('aria-expanded', 'false');
+
+            if (backdrop) {
+                backdrop.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        };
 
         toggle.addEventListener('click', function () {
             const isOpen = toggle.getAttribute('aria-expanded') === 'true';
 
             toggle.setAttribute('aria-expanded', String(!isOpen));
             panel.classList.toggle('hidden', isOpen);
+
+            if (backdrop) {
+                backdrop.classList.toggle('hidden', isOpen);
+                document.body.style.overflow = isOpen ? '' : 'hidden';
+            }
         });
 
         document.addEventListener('click', function (event) {
-            if (!toggle.contains(event.target) && !panel.contains(event.target)) {
-                panel.classList.add('hidden');
-                toggle.setAttribute('aria-expanded', 'false');
+            if (!toggle.contains(event.target)
+                && !panel.contains(event.target)
+                && (!backdrop || !backdrop.contains(event.target))) {
+                close();
             }
         });
+
+        if (backdrop) {
+            backdrop.addEventListener('click', close);
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                close();
+            }
+        });
+
+        return close;
     };
 
     // ===== Overview filters =====
     const filterToggle = document.querySelector('#overview-filter-toggle');
     const filterPanel = document.querySelector('#overview-filter-panel');
+    const filterBackdrop = document.querySelector('#overview-filter-backdrop');
     const dateFromInput = document.querySelector('#date_from');
     const dateToInput = document.querySelector('#date_to');
 
-    setupDropdown(filterToggle, filterPanel);
+    const closeFilterPanel = setupDropdown(filterToggle, filterPanel, filterBackdrop);
+
+    document.querySelector('[data-overview-filter-close]')?.addEventListener('click', closeFilterPanel);
 
     dateFromInput?.addEventListener('change', function () {
         if (dateToInput && dateToInput.value && this.value > dateToInput.value) {

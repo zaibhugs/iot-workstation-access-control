@@ -13,3 +13,60 @@
     --font-mono: 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace';
 }
 
+
+/* =========================================================
+   MOBILE APP MODE (below 768px)
+   Small touches that make the web dashboard feel like a
+   native Android / iOS app.
+========================================================== */
+@media (max-width: 767px) {
+
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        /* No rubber-band bounce behind the fixed app bar / bottom nav. */
+        overscroll-behavior-y: contain;
+    }
+
+    a,
+    button {
+        /* No grey flash on tap, no 300ms double-tap zoom delay. */
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+    }
+
+    /* Hide scrollbars on horizontally scrolling card rows. */
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    /*
+       Filter dropdowns only (marked with .filter-select).
+       - 16px stops iOS Safari from zooming in when a select is tapped.
+       - appearance:none replaces the inconsistent native arrow with a
+         chevron that matches the rest of the mobile UI.
+       - extra right padding keeps long option labels off the arrow.
+    */
+    select.filter-select {
+        -webkit-appearance: none;
+        appearance: none;
+        font-size: 16px;
+        padding-right: 2.5rem;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 1.25rem 1.25rem;
+    }
+
+}
+
+

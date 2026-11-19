@@ -7,12 +7,60 @@
 
     <meta
         name="viewport"
-        content="width=device-width, initial-scale=1.0"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
     >
 
     <meta
         http-equiv="X-UA-Compatible"
         content="ie=edge"
+    >
+
+
+    {{-- =========================================================
+        MOBILE APP METADATA
+        Lets the dashboard be added to the home screen and opened
+        fullscreen, without a service worker or offline caching.
+    ========================================================== --}}
+    <meta
+        name="theme-color"
+        content="#2563eb"
+    >
+
+    <meta
+        name="mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
+
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="default"
+    >
+
+    <meta
+        name="apple-mobile-web-app-title"
+        content="Open Learning Hub"
+    >
+
+    <link
+        rel="manifest"
+        href="{{ asset('manifest.webmanifest') }}"
+    >
+
+    <link
+        rel="apple-touch-icon"
+        href="{{ asset('image/apple-touch-icon.png') }}"
+    >
+
+    <link
+        rel="icon"
+        type="image/png"
+        sizes="192x192"
+        href="{{ asset('image/icon-192.png') }}"
     >
 
     <meta
@@ -37,10 +85,18 @@
 <body class="bg-gray-50 text-gray-900 antialiased">
 
     {{-- =========================================================
+        MOBILE APP SHELL (below 768px)
+        Compact app bar on top, native-style bottom navigation.
+        Desktop keeps the sidebar and full navbar below.
+    ========================================================== --}}
+    <x-mobile-shell :title="$__env->yieldContent('title', 'Dashboard')" />
+
+
+    {{-- =========================================================
         TOP NAVBAR
     ========================================================== --}}
     <nav
-        class="fixed top-0 z-50 w-full border-b border-gray-200 bg-white"
+        class="fixed top-0 z-50 hidden w-full border-b border-gray-200 bg-white md:block"
     >
 
         <div class="px-4 py-3 lg:px-6">
@@ -51,25 +107,6 @@
                     LEFT SIDE
                 ================================================== --}}
                 <div class="flex items-center">
-
-                    {{-- Mobile Sidebar Button --}}
-                    <button
-                        data-drawer-target="logo-sidebar"
-                        data-drawer-toggle="logo-sidebar"
-                        aria-controls="logo-sidebar"
-                        type="button"
-                        class="mr-3 inline-flex h-10 w-10 items-center justify-center rounded-xl text-gray-500 transition hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:hidden"
-                    >
-
-                        <span class="sr-only">
-                            Open sidebar
-                        </span>
-
-
-                        <x-icon name="dash-menu" class="h-5 w-5" aria-hidden="true" />
-
-                    </button>
-
 
                     {{-- Brand: institutional lockup, same as the workstation client --}}
                     <a
@@ -309,7 +346,7 @@
     ========================================================== --}}
     <aside
         id="logo-sidebar"
-        class="fixed left-0 top-0 z-40 h-screen w-64 -translate-x-full border-r border-gray-200 bg-white pt-20 transition-transform sm:translate-x-0"
+        class="fixed left-0 top-0 z-40 hidden h-screen w-64 border-r border-gray-200 bg-white pt-20 md:block"
         aria-label="Sidebar"
     >
 
@@ -682,7 +719,7 @@
         MAIN CONTENT
     ========================================================== --}}
     <main
-        class="min-h-screen bg-gray-50 pt-20 sm:ml-64"
+        class="min-h-screen bg-gray-50 pb-[calc(5rem+env(safe-area-inset-bottom))] pt-16 md:ml-64 md:pb-0 md:pt-20"
     >
 
         <div class="p-4 sm:p-6 lg:p-8">

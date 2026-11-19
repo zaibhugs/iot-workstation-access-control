@@ -56,7 +56,7 @@
                 id="access-result"
                 name="result"
                 data-auto-submit
-                class="rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 sm:w-40"
+                class="filter-select rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-sm text-gray-700 focus:border-blue-500 focus:ring-4 focus:ring-blue-50 sm:w-40"
             >
                 <option value="">All results</option>
                 <option value="allowed" @selected($resultFilter === 'allowed')>Allowed</option>

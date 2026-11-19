@@ -7,7 +7,7 @@
 
 <div class="min-h-full bg-slate-50/70">
 
-    <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-7xl px-4 pb-20 pt-6 sm:px-6 md:pb-6 lg:px-8">
 
         {{-- =========================================================
             PAGE HEADER
@@ -36,11 +36,11 @@
             </div>
 
 
-            {{-- Add User --}}
+            {{-- Add User (desktop button; mobile uses the floating button) --}}
             
             <a
                 href="{{ route('user.create') }}"
-                class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200"
+                class="hidden h-11 items-center justify-center gap-2 rounded-xl bg-blue-700 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-200 md:inline-flex"
             >
 
                 <x-icon name="plus" class="h-5 w-5" aria-hidden="true" />
@@ -51,6 +51,13 @@
             
 
         </div>
+
+
+        {{-- Add User (mobile only) --}}
+        <x-mobile-fab
+            :href="route('user.create')"
+            label="Add User"
+        />
 
 
         {{-- =========================================================
