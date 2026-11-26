@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\PcAccessLogs;
 use App\Models\PcAppUsage;
+use App\Models\StudentSessionLimit;
 use App\Services\MisStudentLookup;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
@@ -101,6 +102,38 @@ class AccessController extends Controller
             'New sign-in on same workstation',
             SessionService::ENDED_BY_SYSTEM
         );
+
+        $studentExternalId = trim((string) ($student['studentNumber'] ?? ''));
+        if ($studentExternalId !== '') {
+            $limit = StudentSessionLimit::where('student_external_id', $studentExternalId)->first();
+            if ($limit) {
+                $maxSessions = $limit->effectiveMaxSessions();
+                $activeCount = $this->sessions->openSessionsQuery()
+                    ->where('pc_access_logs.student_external_id', $studentExternalId)
+                    ->count();
+
+                if ($activeCount >= $maxSessions) {
+                    $reason = $maxSessions === 1
+                        ? 'This account is already active on another workstation.'
+                        : "This account has reached the maximum of {$maxSessions} active workstations.";
+
+                    $this->writeLog([
+                        'occurred_at' => $occurredAt,
+                        'rfid_uid'    => $cardId,
+                        'device_id'   => $device->id,
+                        'event_type'  => 'denied',
+                        'result'      => 'denied',
+                        'reason'      => $reason,
+                        'student'     => $student,
+                    ]);
+
+                    return response()->json([
+                        'allowed' => false,
+                        'reason'  => $reason,
+                    ], Response::HTTP_OK);
+                }
+            }
+        }
 
         $sessionId = Str::uuid()->toString();
 

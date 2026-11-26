@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\StudentSessionLimit;
 use App\Services\ClientSettings;
 use App\Services\MisSettings;
 use Illuminate\Http\Request;
@@ -50,6 +51,7 @@ class SettingController extends Controller
         $shutdownGraceSeconds = $client['shutdown_grace_seconds'];
         $disableTaskManager = $client['disable_task_manager'];
         $adminPin = $client['admin_pin'] ?? '';
+        $studentSessionLimits = StudentSessionLimit::orderBy('student_external_id')->get();
 
 
         return view(
@@ -62,7 +64,8 @@ class SettingController extends Controller
                 'inactivityWarningSeconds',
                 'shutdownGraceSeconds',
                 'disableTaskManager',
-                'adminPin'
+                'adminPin',
+                'studentSessionLimits'
             )
         );
     }

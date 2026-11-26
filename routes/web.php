@@ -11,6 +11,7 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\StudentSessionLimitController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -109,5 +110,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/devices/{device}/delete', [DeviceController::class, 'destroy'])->name('device.destroy');
         Route::get('/settings',[SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings',[SettingController::class, 'update'])->name('settings.update');
+        Route::post('/settings/student-limits', [StudentSessionLimitController::class, 'store'])->name('settings.student-limits.store');
+        Route::delete('/settings/student-limits/{studentSessionLimit}', [StudentSessionLimitController::class, 'destroy'])->name('settings.student-limits.destroy');
     });
 });
