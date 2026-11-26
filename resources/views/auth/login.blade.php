@@ -146,7 +146,7 @@
                                         name="name"
                                         id="name"
                                         value="{{ old('name') }}"
-                                        placeholder="admin12345"
+                                        placeholder=""
                                         autocomplete="username"
                                         required
                                         autofocus
@@ -182,7 +182,7 @@
                                         type="password"
                                         name="password"
                                         id="password"
-                                        placeholder="••••••••"
+                                        placeholder=""
                                         autocomplete="current-password"
                                         required
                                         class="block h-12 w-full rounded-xl border border-white/20 bg-white/90 pl-11 pr-4 text-sm font-medium text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-400/20"
