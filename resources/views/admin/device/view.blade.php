@@ -221,7 +221,7 @@
     </div>
 
     {{-- Recent Staff Commands --}}
-    <div class="mb-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
+    <div class="mb-6 mt-3 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
         <div class="flex flex-col gap-3 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
                 <div class="flex items-center gap-2">
