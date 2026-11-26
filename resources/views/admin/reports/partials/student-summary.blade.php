@@ -358,8 +358,7 @@
                     <th class="whitespace-nowrap px-5 py-4">Student ID</th>
                     <th class="whitespace-nowrap px-5 py-4">Course</th>
                     <th class="whitespace-nowrap px-5 py-4 text-center">Logins</th>
-                    <th class="whitespace-nowrap px-5 py-4 text-center">Sessions</th>
-                    <th class="whitespace-nowrap px-5 py-4 text-center">Computers</th>
+                    <th class="whitespace-nowrap px-5 py-4 text-center">Usage Time</th>
                     <th class="whitespace-nowrap px-5 py-4">First Access</th>
                     <th class="whitespace-nowrap px-5 py-4">Last Access</th>
 
@@ -392,13 +391,16 @@
                             {{ number_format($student->allowed_accesses) }}
                         </td>
 
-
-                        <td class="px-5 py-4 text-center">
-                            {{ number_format($student->total_sessions) }}
-                        </td>
-
-                        <td class="px-5 py-4 text-center">
-                            {{ number_format($student->workstations_used) }}
+                        <td class="whitespace-nowrap px-5 py-4 text-center text-gray-700">
+                            @php
+                                $usageSeconds = max(0, (int) ($student->usage_seconds ?? 0));
+                                $usageHours = intdiv($usageSeconds, 3600);
+                                $usageMinutes = intdiv($usageSeconds % 3600, 60);
+                                $usageLabel = $usageHours > 0
+                                    ? $usageHours.'h '.$usageMinutes.'m'
+                                    : ($usageMinutes > 0 ? $usageMinutes.'m' : ($usageSeconds > 0 ? '<1m' : '0m'));
+                            @endphp
+                            {{ $usageLabel }}
                         </td>
 
                         <td class="whitespace-nowrap px-5 py-4 text-xs">
@@ -423,7 +425,7 @@
 
                     <tr>
 
-                        <td colspan="9" class="px-6 py-16 text-center">
+                        <td colspan="7" class="px-6 py-16 text-center">
 
                             <div class="mx-auto flex max-w-sm flex-col items-center">
 

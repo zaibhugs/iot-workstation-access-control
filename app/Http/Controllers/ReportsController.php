@@ -98,7 +98,6 @@ class ReportsController extends Controller
         );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | REPORT PERIOD
@@ -109,7 +108,7 @@ class ReportsController extends Controller
     {
         $period = $request->input('period');
 
-        if (!$period) {
+        if (! $period) {
 
             if ($request->input('range') === 'all') {
 
@@ -205,7 +204,6 @@ class ReportsController extends Controller
         ];
     }
 
-
     private function applyResolvedPeriod(Request $request): array
     {
         $resolved = $this->resolvePeriod($request);
@@ -219,7 +217,6 @@ class ReportsController extends Controller
 
         return $resolved;
     }
-
 
     private function filterOptions(): array
     {
@@ -261,7 +258,6 @@ class ReportsController extends Controller
         ];
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | ACCESS LOG PDF DOWNLOAD
@@ -276,7 +272,6 @@ class ReportsController extends Controller
                 $this->reportFilename()
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -296,32 +291,27 @@ class ReportsController extends Controller
             )
             ->get();
 
-
         return Pdf::view(
             'admin.reports.AccessLogReport.pdf',
             [
-                'logs' =>
-                    $logs,
+                'logs' => $logs,
 
-                'columns' =>
-                    $this->selectedColumns(
-                        $request
-                    ),
+                'columns' => $this->selectedColumns(
+                    $request
+                ),
 
-                'filters' =>
-                    $request->only([
-                        'search',
-                        'date_from',
-                        'date_to',
-                        'course',
-                        'device',
-                        'event',
-                        'result',
-                        'reason',
-                    ]),
+                'filters' => $request->only([
+                'search',
+                'date_from',
+                'date_to',
+                'course',
+                'device',
+                'event',
+                'result',
+                'reason',
+                ]),
 
-                'generatedAt' =>
-                    now(),
+                'generatedAt' => now(),
             ]
         )
             ->headerView(
@@ -345,7 +335,6 @@ class ReportsController extends Controller
             );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | BUILD ACCESS LOG PDF
@@ -366,32 +355,27 @@ class ReportsController extends Controller
             )
             ->get();
 
-
         return Pdf::view(
             'admin.reports.AccessLogReport.pdf',
             [
-                'logs' =>
-                    $logs,
+                'logs' => $logs,
 
-                'columns' =>
-                    $this->selectedColumns(
-                        $request
-                    ),
+                'columns' => $this->selectedColumns(
+                    $request
+                ),
 
-                'filters' =>
-                    $request->only([
-                        'search',
-                        'date_from',
-                        'date_to',
-                        'course',
-                        'device',
-                        'event',
-                        'result',
-                        'reason',
-                    ]),
+                'filters' => $request->only([
+                'search',
+                'date_from',
+                'date_to',
+                'course',
+                'device',
+                'event',
+                'result',
+                'reason',
+                ]),
 
-                'generatedAt' =>
-                    now(),
+                'generatedAt' => now(),
             ]
         )
             ->headerView(
@@ -412,7 +396,6 @@ class ReportsController extends Controller
             );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | ACCESS LOG PDF FILENAME
@@ -422,13 +405,12 @@ class ReportsController extends Controller
     private function reportFilename(): string
     {
         return
-            'access-report-' .
+            'access-report-'.
             now()->format(
                 'Y-m-d_H-i-s'
-            ) .
+            ).
             '.pdf';
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -441,7 +423,7 @@ class ReportsController extends Controller
     ): array {
 
         if (
-            !$request->boolean(
+            ! $request->boolean(
                 'columns_configured'
             )
         ) {
@@ -455,48 +437,40 @@ class ReportsController extends Controller
             ];
         }
 
-
         $requestedColumns =
             $request->input(
                 'cols',
                 []
             );
 
-
         return [
 
-            'student_name' =>
-                array_key_exists(
-                    'student_name',
-                    $requestedColumns
-                ),
+            'student_name' => array_key_exists(
+                'student_name',
+                $requestedColumns
+            ),
 
-            'course' =>
-                array_key_exists(
-                    'course',
-                    $requestedColumns
-                ),
+            'course' => array_key_exists(
+                'course',
+                $requestedColumns
+            ),
 
-            'device' =>
-                array_key_exists(
-                    'device',
-                    $requestedColumns
-                ),
+            'device' => array_key_exists(
+                'device',
+                $requestedColumns
+            ),
 
-            'date_time' =>
-                array_key_exists(
-                    'date_time',
-                    $requestedColumns
-                ),
+            'date_time' => array_key_exists(
+                'date_time',
+                $requestedColumns
+            ),
 
-            'event' =>
-                array_key_exists(
-                    'event',
-                    $requestedColumns
-                ),
+            'event' => array_key_exists(
+                'event',
+                $requestedColumns
+            ),
         ];
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -535,7 +509,6 @@ class ReportsController extends Controller
                 'devices.id'
             );
 
-
         /*
         |--------------------------------------------------------------------------
         | Search
@@ -556,12 +529,10 @@ class ReportsController extends Controller
                     )
                 );
 
-
             $like =
-                '%' .
-                $search .
+                '%'.
+                $search.
                 '%';
-
 
             $query->where(
                 function (
@@ -618,7 +589,6 @@ class ReportsController extends Controller
                             $like
                         );
 
-
                     if (
                         ctype_digit(
                             $search
@@ -633,7 +603,6 @@ class ReportsController extends Controller
                 }
             );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -651,13 +620,11 @@ class ReportsController extends Controller
                 ? $request->date_to
                 : now()->toDateString();
 
-
             $query->whereDate(
                 'pc_access_logs.occurred_at',
                 '>=',
                 $dateFrom
             );
-
 
             $query->whereDate(
                 'pc_access_logs.occurred_at',
@@ -665,7 +632,6 @@ class ReportsController extends Controller
                 $dateTo
             );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -685,7 +651,6 @@ class ReportsController extends Controller
             );
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Workstation
@@ -703,7 +668,6 @@ class ReportsController extends Controller
                 $request->device
             );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -723,7 +687,6 @@ class ReportsController extends Controller
             );
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Result
@@ -741,7 +704,6 @@ class ReportsController extends Controller
                 $request->result
             );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -761,10 +723,8 @@ class ReportsController extends Controller
             );
         }
 
-
         return $query;
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -773,7 +733,6 @@ class ReportsController extends Controller
     |--------------------------------------------------------------------------
     |--------------------------------------------------------------------------
     */
-
 
     /*
     |--------------------------------------------------------------------------
@@ -790,7 +749,6 @@ class ReportsController extends Controller
                 $request
             );
 
-
         $students = $this
             ->studentSummaryQuery(
                 $filters
@@ -799,7 +757,6 @@ class ReportsController extends Controller
                 'student_name'
             )
             ->get();
-
 
         return $this
             ->summaryPdf(
@@ -810,7 +767,6 @@ class ReportsController extends Controller
                 'student-summary-report-preview.pdf'
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -827,7 +783,6 @@ class ReportsController extends Controller
                 $request
             );
 
-
         $students = $this
             ->studentSummaryQuery(
                 $filters
@@ -836,7 +791,6 @@ class ReportsController extends Controller
                 'student_name'
             )
             ->get();
-
 
         return $this
             ->summaryPdf(
@@ -847,7 +801,6 @@ class ReportsController extends Controller
                 $this->summaryReportFilename()
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -866,30 +819,25 @@ class ReportsController extends Controller
             )->format(
                 'M d, Y'
             )
-            . ' – ' .
+            .' – '.
             Carbon::parse(
                 $filters['date_to']
             )->format(
                 'M d, Y'
             );
 
-
         $analytics = $this->studentSummaryAnalytics($filters, $students);
 
         return Pdf::view(
             'admin.reports.SummaryReport.pdf',
             array_merge([
-                'students' =>
-                    $students,
+                'students' => $students,
 
-                'filters' =>
-                    $filters,
+                'filters' => $filters,
 
-                'periodLabel' =>
-                    $periodLabel,
+                'periodLabel' => $periodLabel,
 
-                'generatedAt' =>
-                    now(),
+                'generatedAt' => now(),
             ], $analytics)
         )
             /*
@@ -922,7 +870,6 @@ class ReportsController extends Controller
             );
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | STUDENT SUMMARY QUERY
@@ -936,6 +883,40 @@ class ReportsController extends Controller
         array $filters
     ) {
 
+        $usageSub = DB::table('pc_access_logs as in_log')
+            ->join('pc_access_logs as out_log', function ($join) {
+                $join->on('in_log.session_id', '=', 'out_log.session_id')
+                    ->whereColumn('in_log.device_id', 'out_log.device_id')
+                    ->where('in_log.event_type', '=', 'time_in')
+                    ->where('out_log.event_type', '=', 'time_out')
+                    ->where('in_log.result', '=', 'allowed')
+                    ->where('out_log.result', '=', 'allowed');
+            })
+            ->leftJoin('devices as u_devices', 'in_log.device_id', '=', 'u_devices.id')
+            ->whereNotNull('in_log.student_external_id')
+            ->where('in_log.student_external_id', '!=', '')
+            ->selectRaw('in_log.student_external_id')
+            ->selectRaw('SUM(GREATEST(TIMESTAMPDIFF(SECOND, in_log.occurred_at, out_log.occurred_at), 0)) AS usage_seconds')
+            ->groupBy('in_log.student_external_id');
+
+        if (! ($filters['all_time'] ?? false)) {
+            $usageSub->whereBetween(
+                'in_log.occurred_at',
+                [
+                    Carbon::parse($filters['date_from'])->startOfDay(),
+                    Carbon::parse($filters['date_to'])->endOfDay(),
+                ]
+            );
+        }
+
+        if (! empty($filters['course'])) {
+            $usageSub->where('in_log.course', $filters['course']);
+        }
+
+        if (! empty($filters['device'])) {
+            $usageSub->where('u_devices.workstation_name', $filters['device']);
+        }
+
         $query = DB::table('pc_access_logs')
             ->leftJoin(
                 'devices',
@@ -943,12 +924,15 @@ class ReportsController extends Controller
                 '=',
                 'devices.id'
             )
+            ->leftJoinSub($usageSub, 'usage_totals', function ($join) {
+                $join->on('pc_access_logs.student_external_id', '=', 'usage_totals.student_external_id');
+            })
             ->where(
                 'pc_access_logs.event_type',
                 'time_in'
             );
 
-        if (!($filters['all_time'] ?? false)) {
+        if (! ($filters['all_time'] ?? false)) {
 
             $query->whereBetween(
                 'pc_access_logs.occurred_at',
@@ -1045,28 +1029,11 @@ class ReportsController extends Controller
 
             /*
             |--------------------------------------------------------------------------
-            | Successful Sessions
+            | Total Usage Time
             |--------------------------------------------------------------------------
             */
 
-            ->selectRaw("
-                COUNT(
-                    DISTINCT CASE
-                        WHEN pc_access_logs.result = 'allowed'
-                        THEN pc_access_logs.session_id
-                    END
-                ) AS total_sessions
-            ")
-
-            /*
-            |--------------------------------------------------------------------------
-            | Number of Workstations Used
-            |--------------------------------------------------------------------------
-            */
-
-            ->selectRaw(
-                'COUNT(DISTINCT pc_access_logs.device_id) AS workstations_used'
-            )
+            ->selectRaw('COALESCE(MAX(usage_totals.usage_seconds), 0) AS usage_seconds')
 
             /*
             |--------------------------------------------------------------------------
@@ -1098,7 +1065,6 @@ class ReportsController extends Controller
                 ) AS last_access
             ");
 
-
         /*
         |--------------------------------------------------------------------------
         | Course Filter
@@ -1106,7 +1072,7 @@ class ReportsController extends Controller
         */
 
         if (
-            !empty(
+            ! empty(
                 $filters['course']
             )
         ) {
@@ -1117,7 +1083,6 @@ class ReportsController extends Controller
             );
         }
 
-
         /*
         |--------------------------------------------------------------------------
         | Workstation Filter
@@ -1125,7 +1090,7 @@ class ReportsController extends Controller
         */
 
         if (
-            !empty(
+            ! empty(
                 $filters['device']
             )
         ) {
@@ -1135,7 +1100,6 @@ class ReportsController extends Controller
                 $filters['device']
             );
         }
-
 
         /*
         |--------------------------------------------------------------------------
@@ -1148,7 +1112,6 @@ class ReportsController extends Controller
                 'pc_access_logs.student_external_id'
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -1190,7 +1153,7 @@ class ReportsController extends Controller
         $chartCourseCounts = [];
         $chartCoursePercentages = [];
         $chartCourseColors = [
-            '#1D4ED8', '#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#CBD5E1'
+            '#1D4ED8', '#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#CBD5E1',
         ];
 
         if ($totalCourseStudents > 0) {
@@ -1253,18 +1216,18 @@ class ReportsController extends Controller
                 DB::raw('TIMESTAMPDIFF(SECOND, in_log.occurred_at, out_log.occurred_at) as duration_seconds')
             );
 
-        if (!($filters['all_time'] ?? false)) {
+        if (! ($filters['all_time'] ?? false)) {
             $sessionDurations->whereBetween('in_log.occurred_at', [
                 Carbon::parse($filters['date_from'])->startOfDay(),
                 Carbon::parse($filters['date_to'])->endOfDay(),
             ]);
         }
 
-        if (!empty($filters['course'])) {
+        if (! empty($filters['course'])) {
             $sessionDurations->where('in_log.course', $filters['course']);
         }
 
-        if (!empty($filters['device'])) {
+        if (! empty($filters['device'])) {
             $sessionDurations->where('devices.workstation_name', $filters['device']);
         }
 
@@ -1282,6 +1245,7 @@ class ReportsController extends Controller
             ->get()
             ->map(function ($s) {
                 $s->formatted_time = $this->formatDurationSeconds((int) $s->total_seconds);
+
                 return $s;
             });
 
@@ -1299,20 +1263,21 @@ class ReportsController extends Controller
             ->get()
             ->map(function ($c) {
                 $c->formatted_time = $this->formatDurationSeconds((int) $c->total_seconds);
+
                 return $c;
             });
 
         return [
-            'courseDistribution'     => $courseDistribution,
-            'chartCourseLabels'      => $chartCourseLabels,
-            'chartCourseCounts'      => $chartCourseCounts,
+            'courseDistribution' => $courseDistribution,
+            'chartCourseLabels' => $chartCourseLabels,
+            'chartCourseCounts' => $chartCourseCounts,
             'chartCoursePercentages' => $chartCoursePercentages,
-            'chartCourseColors'      => $chartCourseColors,
-            'totalCourseStudents'    => $totalCourseStudents,
-            'topStudentsByLogins'    => $topStudentsByLogins,
-            'topStudentsByTime'      => $topStudentsByTime,
-            'topCoursesByLogins'     => $topCoursesByLogins,
-            'topCoursesByTime'       => $topCoursesByTime,
+            'chartCourseColors' => $chartCourseColors,
+            'totalCourseStudents' => $totalCourseStudents,
+            'topStudentsByLogins' => $topStudentsByLogins,
+            'topStudentsByTime' => $topStudentsByTime,
+            'topCoursesByLogins' => $topCoursesByLogins,
+            'topCoursesByTime' => $topCoursesByTime,
         ];
     }
 
@@ -1324,7 +1289,7 @@ class ReportsController extends Controller
         $secs = $seconds % 60;
 
         if ($hours > 0) {
-            return "{$hours}h {$minutes}m" . ($secs > 0 ? " {$secs}s" : '');
+            return "{$hours}h {$minutes}m".($secs > 0 ? " {$secs}s" : '');
         }
 
         if ($minutes > 0) {
@@ -1333,7 +1298,6 @@ class ReportsController extends Controller
 
         return "{$secs}s";
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -1372,7 +1336,6 @@ class ReportsController extends Controller
                 ],
             ]);
 
-
         /*
         |--------------------------------------------------------------------------
         | Optional Date Range
@@ -1392,9 +1355,8 @@ class ReportsController extends Controller
             ? null
             : (($validated['date_to'] ?? null) ?: now()->toDateString());
 
-
         if (
-            !$allTime
+            ! $allTime
             && Carbon::parse($dateTo)
                 ->lt(
                     Carbon::parse(
@@ -1407,28 +1369,21 @@ class ReportsController extends Controller
                 $dateFrom;
         }
 
-
         return [
 
-            'date_from' =>
-                $dateFrom,
+            'date_from' => $dateFrom,
 
-            'date_to' =>
-                $dateTo,
+            'date_to' => $dateTo,
 
-            'course' =>
-                $validated['course']
+            'course' => $validated['course']
                 ?? null,
 
-            'device' =>
-                $validated['device']
+            'device' => $validated['device']
                 ?? null,
 
-            'all_time' =>
-                $allTime,
+            'all_time' => $allTime,
         ];
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -1439,10 +1394,10 @@ class ReportsController extends Controller
     private function summaryReportFilename(): string
     {
         return
-            'student-summary-report-' .
+            'student-summary-report-'.
             now()->format(
                 'Y-m-d_H-i-s'
-            ) .
+            ).
             '.pdf';
     }
 }

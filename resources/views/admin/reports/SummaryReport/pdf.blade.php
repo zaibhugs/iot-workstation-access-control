@@ -526,8 +526,7 @@
                 <th>Student ID</th>
                 <th>Course</th>
                 <th>Allowed</th>
-                <th>Sessions</th>
-                <th>Workstations</th>
+                <th>Usage Time</th>
                 <th>First Access</th>
                 <th>Last Access</th>
             </tr>
@@ -540,8 +539,17 @@
                     <td>{{ $student->student_external_id }}</td>
                     <td>{{ $student->course ?: '—' }}</td>
                     <td>{{ number_format($student->allowed_accesses) }}</td>
-                    <td>{{ number_format($student->total_sessions) }}</td>
-                    <td>{{ number_format($student->workstations_used) }}</td>
+                    <td>
+                        @php
+                            $usageSeconds = max(0, (int) ($student->usage_seconds ?? 0));
+                            $usageHours = intdiv($usageSeconds, 3600);
+                            $usageMinutes = intdiv($usageSeconds % 3600, 60);
+                            $usageLabel = $usageHours > 0
+                                ? $usageHours.'h '.$usageMinutes.'m'
+                                : ($usageMinutes > 0 ? $usageMinutes.'m' : ($usageSeconds > 0 ? '<1m' : '0m'));
+                        @endphp
+                        {{ $usageLabel }}
+                    </td>
                     <td class="muted">
                         {{ $student->first_access ? \Carbon\Carbon::parse($student->first_access)->format('M d, Y h:i A') : '—' }}
                     </td>
@@ -551,7 +559,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td class="empty" colspan="10">No student access records were found for the selected filters.</td>
+                    <td class="empty" colspan="8">No student access records were found for the selected filters.</td>
                 </tr>
             @endforelse
         </tbody>
