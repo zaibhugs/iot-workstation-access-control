@@ -132,12 +132,13 @@
 
 
     {{-- Tabs --}}
-    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-            <h1 class="text-2xl font-semibold tracking-tight text-gray-900">Settings</h1>
-            <p class="mt-1 text-sm text-gray-500">Manage workstation behavior, integrations, and sessions.</p>
-        </div>
-        <div class="inline-flex w-full flex-wrap gap-1 rounded-2xl bg-gray-100/80 p-1 sm:w-auto" role="tablist" aria-label="Settings sections">
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold tracking-tight text-gray-900">Settings</h1>
+        <p class="mt-1 text-sm text-gray-500">Manage workstation behavior, integrations, and sessions.</p>
+    </div>
+
+    <div class="mb-6 flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-1.5 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-wrap items-center gap-1" role="tablist" aria-label="Settings sections">
             @foreach ($tabs as $key => $tab)
                 <button
                     type="button"
@@ -146,13 +147,17 @@
                     aria-controls="panel-{{ $key }}"
                     aria-selected="{{ $activeTab === $key ? 'true' : 'false' }}"
                     data-settings-tab="{{ $key }}"
-                    class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition {{ $activeTab === $key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}"
+                    class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ $activeTab === $key ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900' }}"
                 >
                     <x-icon :name="$tab['icon']" class="h-4 w-4" />
                     {{ $tab['label'] }}
                 </button>
             @endforeach
         </div>
+
+        <p class="px-3 text-xs text-gray-400">
+            Changes save per section.
+        </p>
     </div>
 
 
@@ -886,11 +891,12 @@
             tabs.forEach((tab) => {
                 const active = tab.dataset.settingsTab === name;
 
-                tab.classList.toggle('bg-white', active);
-                tab.classList.toggle('text-gray-900', active);
+                tab.classList.toggle('bg-blue-600', active);
+                tab.classList.toggle('text-white', active);
                 tab.classList.toggle('shadow-sm', active);
                 tab.classList.toggle('text-gray-500', !active);
-                tab.classList.toggle('hover:text-gray-700', !active);
+                tab.classList.toggle('hover:bg-gray-50', !active);
+                tab.classList.toggle('hover:text-gray-900', !active);
                 tab.setAttribute('aria-selected', active ? 'true' : 'false');
                 tab.tabIndex = active ? 0 : -1;
 
