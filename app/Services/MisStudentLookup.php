@@ -61,6 +61,7 @@ class MisStudentLookup
                 'lastName' => (string) ($this->pick($data, ['LastName', 'lastName']) ?? ''),
                 'middleName' => (string) ($this->pick($data, ['MiddleName', 'middleName']) ?? ''),
                 'course' => (string) ($this->pick($data, ['Course', 'course']) ?? ''),
+                'sex' => (string) ($this->pick($data, ['Sex', 'sex', 'Gender', 'gender']) ?? ''),
             ], null];
         } catch (\Throwable $ex) {
             Log::warning('Student database lookup failed.', [
