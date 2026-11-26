@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\StudentSessionLimit;
 use App\Services\ClientSettings;
 use App\Services\MisSettings;
 use App\Services\MisStudentLookup;
@@ -49,7 +48,14 @@ class SettingController extends Controller
         $shutdownGraceSeconds = $client['shutdown_grace_seconds'];
         $disableTaskManager = $client['disable_task_manager'];
         $adminPin = $client['admin_pin'] ?? '';
-        $studentSessionLimits = StudentSessionLimit::orderBy('student_external_id')->get();
+        $studentSingleSessionOnly = (string) $settings->get('student_single_session_only', '1') !== '0';
+        $studentMaxConcurrentSessions = (int) $settings->get('student_max_concurrent_sessions', 2);
+        if ($studentMaxConcurrentSessions < 0) {
+            $studentMaxConcurrentSessions = 0;
+        }
+        if ($studentMaxConcurrentSessions === 1) {
+            $studentMaxConcurrentSessions = 2;
+        }
 
         return view(
             'admin.settings.index',
@@ -62,7 +68,8 @@ class SettingController extends Controller
                 'shutdownGraceSeconds',
                 'disableTaskManager',
                 'adminPin',
-                'studentSessionLimits'
+                'studentSingleSessionOnly',
+                'studentMaxConcurrentSessions'
             )
         );
     }
@@ -135,6 +142,18 @@ class SettingController extends Controller
                 'string',
                 'max:50',
             ];
+
+            $rules['student_single_session_only'] = [
+                'nullable',
+                'boolean',
+            ];
+
+            $rules['student_max_concurrent_sessions'] = [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:50',
+            ];
         }
 
         $validated = $request->validate($rules);
@@ -166,6 +185,18 @@ class SettingController extends Controller
                 $request->boolean('client_disable_task_manager') ? '1' : '0';
 
             $values[ClientSettings::ADMIN_PIN_KEY] = trim((string) $request->input('client_admin_pin', ''));
+
+            $singleOnly = $request->boolean('student_single_session_only');
+            $maxSessions = (int) $request->input('student_max_concurrent_sessions', 2);
+            if ($maxSessions < 0) {
+                $maxSessions = 0;
+            }
+            if (! $singleOnly && $maxSessions === 1) {
+                $maxSessions = 2;
+            }
+
+            $values['student_single_session_only'] = $singleOnly ? '1' : '0';
+            $values['student_max_concurrent_sessions'] = (string) $maxSessions;
         }
 
         DB::transaction(function () use ($values) {

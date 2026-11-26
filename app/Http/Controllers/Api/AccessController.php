@@ -5,10 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\PcAccessLogs;
 use App\Models\PcAppUsage;
-use App\Models\StudentSessionLimit;
 use App\Services\MisStudentLookup;
 use App\Services\SessionService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -44,8 +44,7 @@ class AccessController extends Controller
     public function __construct(
         private SessionService $sessions,
         private MisStudentLookup $mis
-    ) {
-    }
+    ) {}
 
     /**
      * Validate one RFID scan against the university MIS and log the result.
@@ -65,14 +64,14 @@ class AccessController extends Controller
     public function scan(Request $request)
     {
         $validated = $request->validate([
-            'rfid_uid'    => 'required|string|max:100',
-            'pc_port'     => 'required|integer|in:1,2',
+            'rfid_uid' => 'required|string|max:100',
+            'pc_port' => 'required|integer|in:1,2',
             'occurred_at' => 'sometimes|date',
         ]);
 
-        $device  = $request->get('authenticated_device');
-        $pcPort  = (int) $validated['pc_port'];
-        $cardId  = strtoupper($validated['rfid_uid']);
+        $device = $request->get('authenticated_device');
+        $pcPort = (int) $validated['pc_port'];
+        $cardId = strtoupper($validated['rfid_uid']);
         $occurredAt = isset($validated['occurred_at'])
             ? \Illuminate\Support\Carbon::parse($validated['occurred_at'])
             : now();
@@ -81,17 +80,17 @@ class AccessController extends Controller
 
         if ($student === null) {
             $this->writeLog([
-                'occurred_at'    => $occurredAt,
-                'rfid_uid'       => $cardId,
-                'device_id'      => $device->id,
-                'event_type'     => 'denied',
-                'result'         => 'denied',
-                'reason'         => $reason,
+                'occurred_at' => $occurredAt,
+                'rfid_uid' => $cardId,
+                'device_id' => $device->id,
+                'event_type' => 'denied',
+                'result' => 'denied',
+                'reason' => $reason,
             ]);
 
             return response()->json([
                 'allowed' => false,
-                'reason'  => $reason,
+                'reason' => $reason,
             ], Response::HTTP_OK);
         }
 
@@ -105,9 +104,8 @@ class AccessController extends Controller
 
         $studentExternalId = trim((string) ($student['studentNumber'] ?? ''));
         if ($studentExternalId !== '') {
-            $limit = StudentSessionLimit::where('student_external_id', $studentExternalId)->first();
-            if ($limit) {
-                $maxSessions = $limit->effectiveMaxSessions();
+            $maxSessions = $this->studentConcurrentSessionLimit();
+            if ($maxSessions !== null) {
                 $activeCount = $this->sessions->openSessionsQuery()
                     ->where('pc_access_logs.student_external_id', $studentExternalId)
                     ->count();
@@ -119,17 +117,17 @@ class AccessController extends Controller
 
                     $this->writeLog([
                         'occurred_at' => $occurredAt,
-                        'rfid_uid'    => $cardId,
-                        'device_id'   => $device->id,
-                        'event_type'  => 'denied',
-                        'result'      => 'denied',
-                        'reason'      => $reason,
-                        'student'     => $student,
+                        'rfid_uid' => $cardId,
+                        'device_id' => $device->id,
+                        'event_type' => 'denied',
+                        'result' => 'denied',
+                        'reason' => $reason,
+                        'student' => $student,
                     ]);
 
                     return response()->json([
                         'allowed' => false,
-                        'reason'  => $reason,
+                        'reason' => $reason,
                     ], Response::HTTP_OK);
                 }
             }
@@ -138,20 +136,20 @@ class AccessController extends Controller
         $sessionId = Str::uuid()->toString();
 
         $this->writeLog([
-            'occurred_at'    => $occurredAt,
-            'rfid_uid'       => $cardId,
-            'device_id'      => $device->id,
-            'event_type'     => 'time_in',
-            'result'         => 'allowed',
-            'reason'         => 'Authorized',
-            'session_id'     => $sessionId,
-            'student'        => $student,
+            'occurred_at' => $occurredAt,
+            'rfid_uid' => $cardId,
+            'device_id' => $device->id,
+            'event_type' => 'time_in',
+            'result' => 'allowed',
+            'reason' => 'Authorized',
+            'session_id' => $sessionId,
+            'student' => $student,
         ]);
 
         return response()->json([
-            'allowed'    => true,
+            'allowed' => true,
             'session_id' => $sessionId,
-            'student'    => $student,
+            'student' => $student,
         ], Response::HTTP_OK);
     }
 
@@ -165,7 +163,7 @@ class AccessController extends Controller
     public function logout(Request $request)
     {
         $validated = $request->validate([
-            'session_id'  => 'required|string|max:64',
+            'session_id' => 'required|string|max:64',
             'occurred_at' => 'sometimes|date',
         ]);
 
@@ -183,10 +181,10 @@ class AccessController extends Controller
         // Idempotent: a retry (or a duplicate call from the client) must not
         // create a second time_out row or fail the client.
         return response()->json([
-            'success'        => true,
+            'success' => true,
             'already_closed' => ! $closed,
-            'message'        => $closed ? 'Session closed.' : 'Session was already closed.',
-            'session_id'     => $validated['session_id'],
+            'message' => $closed ? 'Session closed.' : 'Session was already closed.',
+            'session_id' => $validated['session_id'],
         ], Response::HTTP_OK);
     }
 
@@ -201,10 +199,10 @@ class AccessController extends Controller
     public function usage(Request $request)
     {
         $validated = $request->validate([
-            'session_id'     => 'required|string|max:64',
-            'occurred_at'    => 'sometimes|date',
-            'apps'           => 'required|array',
-            'apps.*.app'     => 'required|string|max:100',
+            'session_id' => 'required|string|max:64',
+            'occurred_at' => 'sometimes|date',
+            'apps' => 'required|array',
+            'apps.*.app' => 'required|string|max:100',
             'apps.*.seconds' => 'required|integer|min:0',
         ]);
 
@@ -226,10 +224,10 @@ class AccessController extends Controller
             }
 
             PcAppUsage::create([
-                'session_id'  => $validated['session_id'],
-                'rfid_uid'    => $session?->rfid_uid,
-                'app_name'    => $name,
-                'seconds'     => $app['seconds'],
+                'session_id' => $validated['session_id'],
+                'rfid_uid' => $session?->rfid_uid,
+                'app_name' => $name,
+                'seconds' => $app['seconds'],
                 'occurred_at' => $occurredAt,
             ]);
 
@@ -237,7 +235,7 @@ class AccessController extends Controller
         }
 
         return response()->json([
-            'success'  => true,
+            'success' => true,
             'recorded' => $recorded,
         ], Response::HTTP_OK);
     }
@@ -251,12 +249,31 @@ class AccessController extends Controller
         return in_array(mb_strtolower($appName), self::SYSTEM_APP_USAGE_DENYLIST, true);
     }
 
+    private function studentConcurrentSessionLimit(): ?int
+    {
+        $singleOnly = DB::table('system_settings')
+            ->where('key', 'student_single_session_only')
+            ->value('value');
+
+        if ($singleOnly === null || $singleOnly === '1' || $singleOnly === 1 || $singleOnly === true) {
+            return 1;
+        }
+
+        $max = DB::table('system_settings')
+            ->where('key', 'student_max_concurrent_sessions')
+            ->value('value');
+
+        $max = is_numeric($max) ? (int) $max : 0;
+
+        return $max === 0 ? null : max(2, $max);
+    }
+
     /**
      * Write one row to pc_access_logs in the schema the admin pages expect.
      */
     private function writeLog(array $data): void
     {
-        $student   = $data['student'] ?? null;
+        $student = $data['student'] ?? null;
 
         $snapshot = $student === null
             ? []
@@ -266,18 +283,18 @@ class AccessController extends Controller
                 'student_external_id' => ($student['studentNumber'] ?? '') !== ''
                     ? $student['studentNumber']
                     : null,
-                'student_name'        => trim(($student['firstName'] ?? '') . ' ' . ($student['middleName'] ?? '') . ' ' . ($student['lastName'] ?? '')),
-                'course'              => $student['course'] ?? null,
+                'student_name' => trim(($student['firstName'] ?? '').' '.($student['middleName'] ?? '').' '.($student['lastName'] ?? '')),
+                'course' => $student['course'] ?? null,
             ];
 
         PcAccessLogs::create(array_merge([
-            'occurred_at'    => $data['occurred_at'],
-            'rfid_uid'       => $data['rfid_uid'],
-            'device_id'      => $data['device_id'],
-            'event_type'     => $data['event_type'],
-            'result'         => $data['result'],
-            'reason'         => $data['reason'] ?? null,
-            'session_id'     => $data['session_id'] ?? null,
+            'occurred_at' => $data['occurred_at'],
+            'rfid_uid' => $data['rfid_uid'],
+            'device_id' => $data['device_id'],
+            'event_type' => $data['event_type'],
+            'result' => $data['result'],
+            'reason' => $data['reason'] ?? null,
+            'session_id' => $data['session_id'] ?? null,
         ], $snapshot));
     }
 }

@@ -18,10 +18,6 @@
             'label' => 'Sessions',
             'icon' => 'clock',
         ],
-        'student_limits' => [
-            'label' => 'Student Limits',
-            'icon' => 'users',
-        ],
     ];
 
     $requestedTab = (string) (request('tab') ?: old('section'));
@@ -238,6 +234,40 @@
 
 
             <div class="space-y-7">
+
+                <div class="rounded-2xl border border-gray-100 bg-gray-50/50 p-5">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <label for="student_single_session_only" class="block text-sm font-semibold text-gray-900">Limit student to 1 PC session</label>
+                            <p class="mt-1 max-w-xl text-xs leading-5 text-gray-500">When on, the same student/card can only be active on one PC at a time. Turn off to allow multiple PCs.</p>
+                        </div>
+                        <label class="inline-flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
+                            <input type="hidden" name="student_single_session_only" value="0">
+                            <input id="student_single_session_only" name="student_single_session_only" type="checkbox" value="1" {{ old('student_single_session_only', $studentSingleSessionOnly ?? true) ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                            <span class="font-medium">1 PC only</span>
+                        </label>
+                    </div>
+
+                    <div id="student_max_concurrent_sessions_wrap" class="{{ old('student_single_session_only', $studentSingleSessionOnly ?? true) ? 'hidden' : '' }} mt-5 border-t border-gray-200 pt-5">
+                        <label for="student_max_concurrent_sessions" class="mb-2.5 block text-sm font-semibold text-gray-900">Max PCs per student/card</label>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                            <input type="hidden" id="student_max_concurrent_sessions_value" name="student_max_concurrent_sessions" value="{{ old('student_max_concurrent_sessions', $studentMaxConcurrentSessions ?? 2) }}">
+                            <input
+                                id="student_max_concurrent_sessions"
+                                type="number"
+                                min="2"
+                                max="50"
+                                value="{{ old('student_max_concurrent_sessions', ($studentMaxConcurrentSessions ?? 2) === 0 ? 2 : ($studentMaxConcurrentSessions ?? 2)) }}"
+                                class="block w-full max-w-xs rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                            >
+                            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+                                <input id="student_max_concurrent_sessions_unlimited" type="checkbox" {{ (string) old('student_max_concurrent_sessions', $studentMaxConcurrentSessions ?? 2) === '0' ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                Unlimited
+                            </label>
+                        </div>
+                        <p class="mt-2 text-xs leading-5 text-gray-400">Set a number (minimum 2) or choose Unlimited. When "1 PC only" is on, this is ignored.</p>
+                    </div>
+                </div>
 
                 @foreach ($timerFields as $field)
 
@@ -809,108 +839,6 @@
 
     </section>
 
-
-    <section
-        id="panel-student_limits"
-        role="tabpanel"
-        aria-labelledby="tab-student_limits"
-        data-settings-panel="student_limits"
-        class="rounded-3xl border border-gray-100 bg-white shadow-sm @if ($activeTab !== 'student_limits') hidden @endif"
-    >
-        <div class="p-6 sm:p-9">
-            <div class="mb-8 flex items-start gap-4">
-                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600">
-                    <x-icon name="users" class="h-5 w-5" />
-                </div>
-                <div>
-                    <h2 class="text-lg font-bold text-gray-900">Student Session Limits</h2>
-                    <p class="mt-1 max-w-2xl text-sm leading-6 text-gray-500">
-                        Set limits for specific students by ID number. Single login allows 1 PC. Enable multiple login sessions to allow 2 or more. Students without a configured limit are not restricted by this feature.
-                    </p>
-                </div>
-            </div>
-
-            <form method="POST" action="{{ route('settings.student-limits.store') }}" class="rounded-2xl border border-gray-100 bg-gray-50/60 p-5">
-                @csrf
-                <input type="hidden" name="section" value="student_limits">
-                <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                    <div>
-                        <label for="student_external_id" class="mb-2 block text-sm font-semibold text-gray-900">Student ID Number <span class="text-red-500">*</span></label>
-                        <input id="student_external_id" name="student_external_id" type="text" required maxlength="64" value="{{ old('student_external_id') }}" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100" placeholder="e.g. 2310111-1">
-                    </div>
-                    <div>
-                        <label for="student_name" class="mb-2 block text-sm font-semibold text-gray-900">Student Name</label>
-                        <input id="student_name" name="student_name" type="text" maxlength="255" value="{{ old('student_name') }}" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100" placeholder="Optional">
-                    </div>
-                    <div>
-                        <label class="mb-2 block text-sm font-semibold text-gray-900">Multiple Login Sessions</label>
-                        <label class="flex min-h-[48px] items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
-                            <input id="allow_multiple_sessions" name="allow_multiple_sessions" type="checkbox" value="1" {{ old('allow_multiple_sessions') ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            Enable multiple sessions
-                        </label>
-                    </div>
-                    <div>
-                        <label for="max_sessions" class="mb-2 block text-sm font-semibold text-gray-900">Max Sessions</label>
-                        <input id="max_sessions" name="max_sessions" type="number" min="1" max="20" value="{{ old('max_sessions', 1) }}" class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-400 focus:ring-4 focus:ring-blue-100">
-                        <p class="mt-2 text-xs text-gray-400">1 = single PC. If multiple sessions enabled, minimum is 2.</p>
-                    </div>
-                </div>
-                <div class="mt-5 flex justify-end">
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100">
-                        <x-icon name="save-floppy" class="h-5 w-5" />
-                        Save Student Limit
-                    </button>
-                </div>
-            </form>
-
-            <div class="mt-8 overflow-hidden rounded-2xl border border-gray-100">
-                <div class="border-b border-gray-100 bg-gray-50/70 px-5 py-4">
-                    <h3 class="text-sm font-semibold text-gray-900">Configured Students</h3>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-100 text-sm">
-                        <thead class="bg-white text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
-                            <tr>
-                                <th class="px-5 py-3">Student ID</th>
-                                <th class="px-5 py-3">Name</th>
-                                <th class="px-5 py-3">Mode</th>
-                                <th class="px-5 py-3">Max Sessions</th>
-                                <th class="px-5 py-3 text-right">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100 bg-white">
-                            @forelse ($studentSessionLimits ?? [] as $limit)
-                                <tr>
-                                    <td class="px-5 py-4 font-medium text-gray-900">{{ $limit->student_external_id }}</td>
-                                    <td class="px-5 py-4 text-gray-600">{{ $limit->student_name ?: '—' }}</td>
-                                    <td class="px-5 py-4">
-                                        @if ($limit->allow_multiple_sessions)
-                                            <span class="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">Multiple</span>
-                                        @else
-                                            <span class="inline-flex rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">Single</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-5 py-4 text-gray-700">{{ $limit->effectiveMaxSessions() }}</td>
-                                    <td class="px-5 py-4 text-right">
-                                        <form method="POST" action="{{ route('settings.student-limits.destroy', $limit) }}" onsubmit="return confirm('Remove this student session limit?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="text-sm font-semibold text-red-600 hover:text-red-700">Remove</button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="px-5 py-8 text-center text-sm text-gray-500">No student session limits configured.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-
 </div>
 
 
@@ -992,20 +920,26 @@
             update();
         });
 
-        const multiToggle = document.getElementById('allow_multiple_sessions');
-        const maxSessions = document.getElementById('max_sessions');
-        if (multiToggle && maxSessions) {
-            const syncMaxSessions = () => {
-                if (multiToggle.checked) {
-                    maxSessions.min = '2';
-                    if (Number.parseInt(maxSessions.value, 10) < 2) maxSessions.value = '2';
-                } else {
-                    maxSessions.min = '1';
-                    maxSessions.value = '1';
+        const singleOnly = document.getElementById('student_single_session_only');
+        const maxWrap = document.getElementById('student_max_concurrent_sessions_wrap');
+        const maxInput = document.getElementById('student_max_concurrent_sessions');
+        const maxValue = document.getElementById('student_max_concurrent_sessions_value');
+        const unlimited = document.getElementById('student_max_concurrent_sessions_unlimited');
+        if (singleOnly && maxWrap && maxInput && maxValue && unlimited) {
+            const sync = () => {
+                const off = !singleOnly.checked;
+                maxWrap.classList.toggle('hidden', !off);
+                const isUnlimited = unlimited.checked;
+                maxInput.disabled = !off || isUnlimited;
+                if (!isUnlimited && Number.parseInt(maxInput.value, 10) < 2) {
+                    maxInput.value = '2';
                 }
+                maxValue.value = isUnlimited ? '0' : String(Math.max(2, Number.parseInt(maxInput.value, 10) || 2));
             };
-            multiToggle.addEventListener('change', syncMaxSessions);
-            syncMaxSessions();
+            singleOnly.addEventListener('change', sync);
+            unlimited.addEventListener('change', sync);
+            maxInput.addEventListener('input', sync);
+            sync();
         }
 
         const hash = window.location.hash.replace('#', '');

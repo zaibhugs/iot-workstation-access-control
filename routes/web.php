@@ -10,7 +10,6 @@ use App\Http\Controllers\MonitoringController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\SettingController;
-use App\Http\Controllers\StudentSessionLimitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -109,7 +108,5 @@ Route::middleware('auth')->group(function () {
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
         Route::post('/settings/test-mis-lookup', [SettingController::class, 'testMisLookup'])->name('settings.test-mis-lookup');
-        Route::post('/settings/student-limits', [StudentSessionLimitController::class, 'store'])->name('settings.student-limits.store');
-        Route::delete('/settings/student-limits/{studentSessionLimit}', [StudentSessionLimitController::class, 'destroy'])->name('settings.student-limits.destroy');
     });
 });
