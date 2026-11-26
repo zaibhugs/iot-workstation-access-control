@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\StudentSessionLimit;
 use App\Services\ClientSettings;
 use App\Services\MisSettings;
+use App\Services\MisStudentLookup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,9 +13,9 @@ class SettingController extends Controller
 {
     public function __construct(
         private MisSettings $mis,
-        private ClientSettings $clientSettings
-    ) {
-    }
+        private ClientSettings $clientSettings,
+        private MisStudentLookup $misLookup
+    ) {}
 
     /*
     |--------------------------------------------------------------------------
@@ -27,7 +28,6 @@ class SettingController extends Controller
         $settings = DB::table('system_settings')
             ->pluck('value', 'key');
 
-
         // Show the value that is actually in use: the saved override when
         // present, otherwise the MIS_API_BASE_URL fallback from .env.
         $studentApiUrl = $this->mis->baseUrl();
@@ -35,13 +35,11 @@ class SettingController extends Controller
         // Resolved endpoint with the {cardId} placeholder kept visible.
         $currentEndpoint = $this->mis->endpointFor();
 
-
         $staleSessionMinutes =
             (int) $settings->get(
                 'stale_session_minutes',
                 5
             );
-
 
         // Clamped client behavior values (same payload the devices receive).
         $client = $this->clientSettings->all();
@@ -52,7 +50,6 @@ class SettingController extends Controller
         $disableTaskManager = $client['disable_task_manager'];
         $adminPin = $client['admin_pin'] ?? '';
         $studentSessionLimits = StudentSessionLimit::orderBy('student_external_id')->get();
-
 
         return view(
             'admin.settings.index',
@@ -69,7 +66,6 @@ class SettingController extends Controller
             )
         );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -110,22 +106,22 @@ class SettingController extends Controller
             $rules['client_no_presence_timeout_seconds'] = [
                 'required',
                 'integer',
-                'min:' . ClientSettings::MIN_NO_PRESENCE,
-                'max:' . ClientSettings::MAX_NO_PRESENCE,
+                'min:'.ClientSettings::MIN_NO_PRESENCE,
+                'max:'.ClientSettings::MAX_NO_PRESENCE,
             ];
 
             $rules['client_inactivity_warning_seconds'] = [
                 'required',
                 'integer',
-                'min:' . ClientSettings::MIN_WARNING,
-                'max:' . ClientSettings::MAX_WARNING,
+                'min:'.ClientSettings::MIN_WARNING,
+                'max:'.ClientSettings::MAX_WARNING,
             ];
 
             $rules['client_shutdown_grace_seconds'] = [
                 'required',
                 'integer',
-                'min:' . ClientSettings::MIN_GRACE,
-                'max:' . ClientSettings::MAX_GRACE,
+                'min:'.ClientSettings::MIN_GRACE,
+                'max:'.ClientSettings::MAX_GRACE,
             ];
 
             $rules['client_disable_task_manager'] = [
@@ -142,7 +138,6 @@ class SettingController extends Controller
         }
 
         $validated = $request->validate($rules);
-
 
         $values = [];
 
@@ -173,7 +168,6 @@ class SettingController extends Controller
             $values[ClientSettings::ADMIN_PIN_KEY] = trim((string) $request->input('client_admin_pin', ''));
         }
 
-
         DB::transaction(function () use ($values) {
 
             foreach ($values as $key => $value) {
@@ -196,7 +190,6 @@ class SettingController extends Controller
 
         });
 
-
         $tab = $section ?? 'client';
 
         $messages = [
@@ -205,9 +198,31 @@ class SettingController extends Controller
             'sessions' => 'Session cleanup settings saved.',
         ];
 
-
         return redirect()
             ->route('settings.index', ['tab' => $tab])
             ->with('success', $messages[$tab]);
+    }
+
+    public function testMisLookup(Request $request)
+    {
+        $validated = $request->validate([
+            'uid' => ['required', 'string', 'max:64'],
+        ]);
+
+        $uid = trim((string) $validated['uid']);
+        [$student, $reason] = $this->misLookup->lookup($uid);
+
+        $result = [
+            'uid' => $uid,
+            'ok' => $student !== null,
+            'student' => $student,
+            'reason' => $reason,
+            'endpoint' => $this->mis->endpointFor($uid),
+        ];
+
+        return redirect()
+            ->route('settings.index', ['tab' => 'mis'])
+            ->with('mis_test_result', $result)
+            ->withInput(['mis_test_uid' => $uid]);
     }
 }

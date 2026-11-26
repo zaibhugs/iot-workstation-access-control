@@ -594,6 +594,63 @@
 
         </form>
 
+        <div class="border-t border-gray-100 px-6 pb-6 pt-6 sm:px-9 sm:pb-9">
+            <div class="rounded-2xl border border-gray-200 bg-gray-50/60 p-5">
+                <div class="mb-4 flex items-start gap-3">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
+                        <x-icon name="link" class="h-5 w-5" />
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-semibold text-gray-900">Test RFID Lookup</h3>
+                        <p class="mt-1 text-xs leading-5 text-gray-500">Test the currently configured MIS/UISA endpoint by entering an RFID card UID.</p>
+                    </div>
+                </div>
+
+                <form method="POST" action="{{ route('settings.test-mis-lookup') }}" class="flex flex-col gap-3 sm:flex-row">
+                    @csrf
+                    <div class="flex-1">
+                        <label for="mis_test_uid" class="sr-only">RFID UID</label>
+                        <input
+                            id="mis_test_uid"
+                            name="uid"
+                            type="text"
+                            value="{{ old('mis_test_uid', session('mis_test_result.uid')) }}"
+                            placeholder="Enter RFID card UID, e.g. 01020304"
+                            class="block w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder-gray-400 transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                            required
+                        >
+                    </div>
+                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-200">
+                        Test Lookup
+                    </button>
+                </form>
+
+                @php($misTest = session('mis_test_result'))
+                @if($misTest)
+                    <div class="mt-4 rounded-xl border {{ $misTest['ok'] ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50' }} p-4 text-sm">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $misTest['ok'] ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
+                                {{ $misTest['ok'] ? 'Student Found' : 'Lookup Failed' }}
+                            </span>
+                            <span class="text-xs text-gray-500">UID: <span class="font-mono">{{ $misTest['uid'] }}</span></span>
+                        </div>
+                        @if($misTest['ok'] && is_array($misTest['student']))
+                            <div class="mt-3 grid gap-2 text-gray-700 sm:grid-cols-2">
+                                <div><span class="text-gray-500">Student No:</span> <span class="font-medium">{{ $misTest['student']['studentNumber'] ?? '' }}</span></div>
+                                <div><span class="text-gray-500">Card No:</span> <span class="font-medium font-mono">{{ $misTest['student']['cardId'] ?? '' }}</span></div>
+                                <div class="sm:col-span-2"><span class="text-gray-500">Name:</span> <span class="font-medium">{{ trim(($misTest['student']['lastName'] ?? '') . ', ' . ($misTest['student']['firstName'] ?? '') . ' ' . ($misTest['student']['middleName'] ?? '')) }}</span></div>
+                                <div><span class="text-gray-500">Course:</span> <span class="font-medium">{{ $misTest['student']['course'] ?? '' }}</span></div>
+                                <div><span class="text-gray-500">Sex:</span> <span class="font-medium">{{ $misTest['student']['sex'] ?? '' }}</span></div>
+                            </div>
+                        @else
+                            <p class="mt-3 text-amber-800">{{ $misTest['reason'] ?: 'Unknown error.' }}</p>
+                        @endif
+                        <p class="mt-3 break-all text-xs text-gray-500">Endpoint: <span class="font-mono">{{ $misTest['endpoint'] }}</span></p>
+                    </div>
+                @endif
+            </div>
+        </div>
+
     </section>
 
 
