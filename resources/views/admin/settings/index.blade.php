@@ -56,19 +56,7 @@
 
 <div class="mx-auto max-w-5xl">
 
-    {{-- Page header --}}
-    <div class="mb-8">
 
-        <h1 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-            System Settings
-        </h1>
-
-        <p class="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
-            Configure workstation client behavior, the student-system connection, and stale-session cleanup.
-            Each section saves on its own.
-        </p>
-
-    </div>
 
 
     {{-- Success message --}}
@@ -144,18 +132,13 @@
 
 
     {{-- Tabs --}}
-    <div
-        class="mb-6 flex flex-col gap-3 rounded-2xl border border-gray-100 bg-white p-1.5 shadow-sm sm:flex-row sm:items-center sm:justify-between"
-    >
-
-        <div
-            class="flex flex-wrap items-center gap-1"
-            role="tablist"
-            aria-label="Settings sections"
-        >
-
+    <div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-semibold tracking-tight text-gray-900">Settings</h1>
+            <p class="mt-1 text-sm text-gray-500">Manage workstation behavior, integrations, and sessions.</p>
+        </div>
+        <div class="inline-flex w-full flex-wrap gap-1 rounded-2xl bg-gray-100/80 p-1 sm:w-auto" role="tablist" aria-label="Settings sections">
             @foreach ($tabs as $key => $tab)
-
                 <button
                     type="button"
                     role="tab"
@@ -163,24 +146,13 @@
                     aria-controls="panel-{{ $key }}"
                     aria-selected="{{ $activeTab === $key ? 'true' : 'false' }}"
                     data-settings-tab="{{ $key }}"
-                    class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition {{ $activeTab === $key ? 'bg-blue-600 text-white shadow-sm' : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900' }}"
+                    class="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition {{ $activeTab === $key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700' }}"
                 >
-
                     <x-icon :name="$tab['icon']" class="h-4 w-4" />
-
                     {{ $tab['label'] }}
-
                 </button>
-
             @endforeach
-
         </div>
-
-
-        <p class="px-3 text-xs text-gray-400">
-            Each section saves independently.
-        </p>
-
     </div>
 
 
@@ -234,40 +206,6 @@
 
 
             <div class="space-y-7">
-
-                <div class="rounded-2xl border border-gray-100 bg-gray-50/50 p-5">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                            <label for="student_single_session_only" class="block text-sm font-semibold text-gray-900">Limit student to 1 PC session</label>
-                            <p class="mt-1 max-w-xl text-xs leading-5 text-gray-500">When on, the same student/card can only be active on one PC at a time. Turn off to allow multiple PCs.</p>
-                        </div>
-                        <label class="inline-flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
-                            <input type="hidden" name="student_single_session_only" value="0">
-                            <input id="student_single_session_only" name="student_single_session_only" type="checkbox" value="1" {{ old('student_single_session_only', $studentSingleSessionOnly ?? true) ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                            <span class="font-medium">1 PC only</span>
-                        </label>
-                    </div>
-
-                    <div id="student_max_concurrent_sessions_wrap" class="{{ old('student_single_session_only', $studentSingleSessionOnly ?? true) ? 'hidden' : '' }} mt-5 border-t border-gray-200 pt-5">
-                        <label for="student_max_concurrent_sessions" class="mb-2.5 block text-sm font-semibold text-gray-900">Max PCs per student/card</label>
-                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-                            <input type="hidden" id="student_max_concurrent_sessions_value" name="student_max_concurrent_sessions" value="{{ old('student_max_concurrent_sessions', $studentMaxConcurrentSessions ?? 2) }}">
-                            <input
-                                id="student_max_concurrent_sessions"
-                                type="number"
-                                min="2"
-                                max="50"
-                                value="{{ old('student_max_concurrent_sessions', ($studentMaxConcurrentSessions ?? 2) === 0 ? 2 : ($studentMaxConcurrentSessions ?? 2)) }}"
-                                class="block w-full max-w-xs rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
-                            >
-                            <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-                                <input id="student_max_concurrent_sessions_unlimited" type="checkbox" {{ (string) old('student_max_concurrent_sessions', $studentMaxConcurrentSessions ?? 2) === '0' ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
-                                Unlimited
-                            </label>
-                        </div>
-                        <p class="mt-2 text-xs leading-5 text-gray-400">Set a number (minimum 2) or choose Unlimited. When "1 PC only" is on, this is ignored.</p>
-                    </div>
-                </div>
 
                 @foreach ($timerFields as $field)
 
@@ -397,34 +335,17 @@
 
             <div class="mt-6 border-t border-gray-100 pt-7">
 
-                <label
-                    class="flex cursor-pointer items-start gap-3 rounded-2xl border border-gray-200 bg-gray-50 p-4"
-                >
-
-                    <input
-                        type="checkbox"
-                        id="client_disable_task_manager"
-                        name="client_disable_task_manager"
-                        value="1"
-                        @checked(old('client_disable_task_manager', $disableTaskManager ?? false))
-                        class="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    >
-
-
-                    <span>
-
-                        <span class="block text-sm font-semibold text-gray-900">
-                            Disable Task Manager
-                        </span>
-
-                        <span class="mt-1 block max-w-xl text-xs leading-5 text-gray-500">
-                            The access agent applies this machine-wide so students cannot end the
-                            client process. Leave it off if staff need Task Manager on this PC.
-                        </span>
-
-                    </span>
-
-                </label>
+                <div class="flex items-start justify-between gap-4 rounded-2xl border border-gray-100 bg-gray-50/40 p-5">
+                    <div>
+                        <p class="text-sm font-semibold text-gray-900">Disable Task Manager</p>
+                        <p class="mt-1 max-w-xl text-xs leading-5 text-gray-500">The access agent applies this machine-wide so students cannot end the client process. Leave it off if staff need Task Manager on this PC.</p>
+                    </div>
+                    <label class="inline-flex cursor-pointer items-center self-start">
+                        <input type="hidden" name="client_disable_task_manager" value="0">
+                        <input type="checkbox" id="client_disable_task_manager" name="client_disable_task_manager" value="1" class="peer sr-only" @checked(old('client_disable_task_manager', $disableTaskManager ?? false))>
+                        <div class="relative h-7 w-12 shrink-0 rounded-full bg-gray-200 transition peer-checked:bg-blue-600 after:absolute after:left-[2px] after:top-[2px] after:h-6 after:w-6 after:rounded-full after:bg-white after:shadow-sm after:transition after:content-[''] peer-checked:after:translate-x-5 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100"></div>
+                    </label>
+                </div>
 
 
                 @error('client_disable_task_manager')
@@ -539,12 +460,13 @@
 
 
                     <input
-                        type="url"
+                        type="text"
+                        inputmode="url"
                         id="student_api_url"
                         name="student_api_url"
                         value="{{ old('student_api_url', $studentApiUrl ?? '') }}"
                         required
-                        placeholder="https://students.example.edu/api"
+                        placeholder="https://uisa.learning-commons.site"
                         class="block w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
                     >
 
@@ -561,10 +483,83 @@
 
 
                 <p class="mt-2 text-xs leading-5 text-gray-400">
-                    Saving here overrides <span class="font-mono">MIS_API_BASE_URL</span>
-                    from <span class="font-mono">.env</span>.
+                    Base address of the student database. If you paste a full endpoint containing <span class="font-mono">{cardId}</span>, it will be used as-is.
                 </p>
 
+            </div>
+
+            <div>
+                <label
+                    for="student_api_path"
+                    class="mb-2.5 block text-sm font-semibold text-gray-900"
+                >
+                    Student Lookup Path
+                    <span class="text-red-500">*</span>
+                </label>
+
+                <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                        <x-icon name="hash" class="h-5 w-5 text-gray-400" />
+                    </div>
+
+                    <input
+                        type="text"
+                        id="student_api_path"
+                        name="student_api_path"
+                        value="{{ old('student_api_path', $studentApiPath ?? '/api/students/{cardId}') }}"
+                        required
+                        placeholder="/api/students/{cardId}"
+                        class="block w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-4 font-mono text-sm text-gray-900 placeholder-gray-400 transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                    >
+                </div>
+
+                @error('student_api_path')
+                    <p class="mt-2 text-xs font-medium text-red-600">{{ $message }}</p>
+                @enderror
+
+                <p class="mt-2 text-xs leading-5 text-gray-400">
+                    Use <span class="font-mono">{cardId}</span> where the scanned RFID/card UID should be inserted. Example: <span class="font-mono">/api/students/{cardId}</span>.
+                </p>
+            </div>
+
+            <div>
+                <label for="mis_api_key" class="mb-2.5 block text-sm font-semibold text-gray-900">
+                    API Key <span class="font-normal text-gray-400">(optional)</span>
+                </label>
+
+                <div class="relative">
+                    <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                        <x-icon name="lock" class="h-5 w-5 text-gray-400" />
+                    </div>
+
+                    <input
+                        type="password"
+                        id="mis_api_key"
+                        name="mis_api_key"
+                        value="{{ old('mis_api_key', $studentApiKey ?? '') }}"
+                        autocomplete="off"
+                        placeholder="Leave blank if not required"
+                        class="block w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-12 text-sm text-gray-900 placeholder-gray-400 transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                    >
+
+                    <button
+                        type="button"
+                        id="mis_api_key_toggle"
+                        class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400 transition hover:text-gray-600"
+                        aria-label="Show API key"
+                    >
+                        <x-icon name="eye" class="h-5 w-5" data-eye-open />
+                        <x-icon name="eye-off" class="hidden h-5 w-5" data-eye-off />
+                    </button>
+                </div>
+
+                @error('mis_api_key')
+                    <p class="mt-2 text-xs font-medium text-red-600">{{ $message }}</p>
+                @enderror
+
+                <p class="mt-2 text-xs leading-5 text-gray-400">
+                    Leave blank if the student database does not require an API key. Saved value overrides <span class="font-mono">MIS_API_KEY</span> from <span class="font-mono">.env</span>.
+                </p>
             </div>
 
 
@@ -636,7 +631,7 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('settings.test-mis-lookup') }}" class="flex flex-col gap-3 sm:flex-row">
+                <form id="mis-test-form" method="POST" action="{{ route('settings.test-mis-lookup') }}" class="flex flex-col gap-3 sm:flex-row">
                     @csrf
                     <div class="flex-1">
                         <label for="mis_test_uid" class="sr-only">RFID UID</label>
@@ -650,8 +645,12 @@
                             required
                         >
                     </div>
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-200">
-                        Test Lookup
+                    <button id="mis-test-submit" type="submit" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-70">
+                        <svg data-spinner class="hidden h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                        </svg>
+                        <span data-label>Test Lookup</span>
                     </button>
                 </form>
 
@@ -731,17 +730,50 @@
                 </div>
 
             </div>
+            <div class="space-y-8">
+                <div class="rounded-2xl border border-gray-100 bg-gray-50/40 p-5 sm:p-6">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                        <div class="max-w-xl">
+                            <p class="text-sm font-semibold text-gray-900">Limit student to 1 PC session</p>
+                            <p class="mt-1 text-sm leading-6 text-gray-500">When enabled, the same student/card can only be active on one PC at a time.</p>
+                        </div>
+                        <label class="inline-flex cursor-pointer items-center gap-3 self-start">
+                            <span id="student_single_session_only_label" class="text-sm font-medium text-gray-600">{{ old('student_single_session_only', $studentSingleSessionOnly ?? true) ? 'On' : 'Off' }}</span>
+                            <input type="hidden" name="student_single_session_only" value="0">
+                            <input id="student_single_session_only" name="student_single_session_only" type="checkbox" value="1" class="peer sr-only" {{ old('student_single_session_only', $studentSingleSessionOnly ?? true) ? 'checked' : '' }}>
+                            <div class="relative h-7 w-12 rounded-full bg-gray-200 transition peer-checked:bg-blue-600 after:absolute after:left-[2px] after:top-[2px] after:h-6 after:w-6 after:rounded-full after:bg-white after:shadow-sm after:transition after:content-[''] peer-checked:after:translate-x-5 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-100"></div>
+                        </label>
+                    </div>
 
+                    <div id="student_max_concurrent_sessions_wrap" class="{{ old('student_single_session_only', $studentSingleSessionOnly ?? true) ? 'hidden' : '' }} mt-5 border-t border-gray-200/80 pt-5">
+                        <label for="student_max_concurrent_sessions" class="mb-2 block text-sm font-medium text-gray-900">Max PCs per student/card</label>
+                        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+                            <input type="hidden" id="student_max_concurrent_sessions_value" name="student_max_concurrent_sessions" value="{{ old('student_max_concurrent_sessions', $studentMaxConcurrentSessions ?? 2) }}">
+                            <input
+                                id="student_max_concurrent_sessions"
+                                type="number"
+                                min="2"
+                                max="50"
+                                value="{{ old('student_max_concurrent_sessions', ($studentMaxConcurrentSessions ?? 2) === 0 ? 2 : ($studentMaxConcurrentSessions ?? 2)) }}"
+                                class="block w-full max-w-[180px] rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                            >
+                            <label class="inline-flex cursor-pointer items-center gap-2 text-sm text-gray-600">
+                                <input id="student_max_concurrent_sessions_unlimited" type="checkbox" {{ (string) old('student_max_concurrent_sessions', $studentMaxConcurrentSessions ?? 2) === '0' ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                                Unlimited
+                            </label>
+                        </div>
+                        <p class="mt-2 text-xs leading-5 text-gray-400">Minimum 2 PCs, or select Unlimited.</p>
+                    </div>
+                </div>
 
-            <div>
-
-                <label
-                    for="stale_session_minutes"
-                    class="mb-2.5 block text-sm font-semibold text-gray-900"
-                >
-                    Stale Session Threshold
-                    <span class="text-red-500">*</span>
-                </label>
+                <div>
+                    <label
+                        for="stale_session_minutes"
+                        class="mb-2.5 block text-sm font-semibold text-gray-900"
+                    >
+                        Stale Session Threshold
+                        <span class="text-red-500">*</span>
+                    </label>
 
 
                 <div class="relative max-w-md">
@@ -812,6 +844,7 @@
                     minutes.
                 </p>
 
+                </div>
             </div>
 
 
@@ -853,12 +886,11 @@
             tabs.forEach((tab) => {
                 const active = tab.dataset.settingsTab === name;
 
-                tab.classList.toggle('bg-blue-600', active);
-                tab.classList.toggle('text-white', active);
+                tab.classList.toggle('bg-white', active);
+                tab.classList.toggle('text-gray-900', active);
                 tab.classList.toggle('shadow-sm', active);
                 tab.classList.toggle('text-gray-500', !active);
-                tab.classList.toggle('hover:bg-gray-50', !active);
-                tab.classList.toggle('hover:text-gray-900', !active);
+                tab.classList.toggle('hover:text-gray-700', !active);
                 tab.setAttribute('aria-selected', active ? 'true' : 'false');
                 tab.tabIndex = active ? 0 : -1;
 
@@ -921,6 +953,7 @@
         });
 
         const singleOnly = document.getElementById('student_single_session_only');
+        const singleOnlyLabel = document.getElementById('student_single_session_only_label');
         const maxWrap = document.getElementById('student_max_concurrent_sessions_wrap');
         const maxInput = document.getElementById('student_max_concurrent_sessions');
         const maxValue = document.getElementById('student_max_concurrent_sessions_value');
@@ -928,6 +961,7 @@
         if (singleOnly && maxWrap && maxInput && maxValue && unlimited) {
             const sync = () => {
                 const off = !singleOnly.checked;
+                if (singleOnlyLabel) singleOnlyLabel.textContent = singleOnly.checked ? 'On' : 'Off';
                 maxWrap.classList.toggle('hidden', !off);
                 const isUnlimited = unlimited.checked;
                 maxInput.disabled = !off || isUnlimited;
@@ -940,6 +974,30 @@
             unlimited.addEventListener('change', sync);
             maxInput.addEventListener('input', sync);
             sync();
+        }
+
+        const apiKeyInput = document.getElementById('mis_api_key');
+        const apiKeyToggle = document.getElementById('mis_api_key_toggle');
+        if (apiKeyInput && apiKeyToggle) {
+            apiKeyToggle.addEventListener('click', () => {
+                const show = apiKeyInput.type === 'password';
+                apiKeyInput.type = show ? 'text' : 'password';
+                apiKeyToggle.setAttribute('aria-label', show ? 'Hide API key' : 'Show API key');
+                apiKeyToggle.querySelector('[data-eye-open]')?.classList.toggle('hidden', show);
+                apiKeyToggle.querySelector('[data-eye-off]')?.classList.toggle('hidden', !show);
+            });
+        }
+
+        const misTestForm = document.getElementById('mis-test-form');
+        const misTestSubmit = document.getElementById('mis-test-submit');
+        if (misTestForm && misTestSubmit) {
+            misTestForm.addEventListener('submit', () => {
+                if (misTestSubmit.disabled) return;
+                misTestSubmit.disabled = true;
+                misTestSubmit.querySelector('[data-spinner]')?.classList.remove('hidden');
+                const label = misTestSubmit.querySelector('[data-label]');
+                if (label) label.textContent = 'Testing...';
+            });
         }
 
         const hash = window.location.hash.replace('#', '');

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Looks up one RFID card in the university MIS.
@@ -14,29 +15,19 @@ use Illuminate\Support\Facades\Http;
  */
 class MisStudentLookup
 {
-    public function __construct(private MisSettings $settings)
-    {
-    }
+    public function __construct(private MisSettings $settings) {}
 
     /**
      * @return array{0: array<string, string>|null, 1: string|null}
-     *         [student, reason]. A null student always has a reason.
+     *                                                              [student, reason]. A null student always has a reason.
      */
     public function lookup(string $cardId): array
     {
         $timeout = $this->settings->timeout();
-        $base = $this->settings->baseUrl();
-        $path = $this->settings->studentPath();
-        $path = str_replace(
-            ['{cardId}', '{cardNo}'],
-            rawurlencode($cardId),
-            $path
-        );
-
-        $url = $base . '/' . ltrim($path, '/');
+        $url = $this->settings->endpointFor($cardId);
 
         try {
-            $request = Http::timeout($timeout);
+            $request = Http::timeout($timeout)->acceptJson();
 
             $misKey = $this->settings->apiKey();
             if ($misKey !== '') {
@@ -49,30 +40,47 @@ class MisStudentLookup
                 return [null, 'Card is not registered in the university MIS.'];
             }
 
-            if ($response->unauthorized()) {
-                return [null, 'MIS rejected the API key.'];
+            if ($response->unauthorized() || $response->forbidden()) {
+                return [null, 'Student Database rejected the API key.'];
             }
 
             if (! $response->successful()) {
-                return [null, 'MIS returned an unexpected response (' . $response->status() . ').'];
+                return [null, 'Student Database returned an unexpected response (HTTP '.$response->status().').'];
             }
 
             $data = $this->unwrap($response->json() ?? []);
 
             if (! is_array($data)) {
-                return [null, 'MIS returned an unexpected response.'];
+                return [null, 'Student Database returned an unexpected response.'];
             }
 
             return [[
-                'cardId'         => (string) ($this->pick($data, ['CardNo', 'cardNo', 'cardId', 'CardId']) ?? $cardId),
-                'studentNumber'  => (string) ($this->pick($data, ['StudentNo', 'studentNo', 'studentNumber', 'StudentNumber']) ?? ''),
-                'firstName'      => (string) ($this->pick($data, ['FirstName', 'firstName']) ?? ''),
-                'lastName'       => (string) ($this->pick($data, ['LastName', 'lastName']) ?? ''),
-                'middleName'     => (string) ($this->pick($data, ['MiddleName', 'middleName']) ?? ''),
-                'course'         => (string) ($this->pick($data, ['Course', 'course']) ?? ''),
+                'cardId' => (string) ($this->pick($data, ['CardNo', 'cardNo', 'cardId', 'CardId']) ?? $cardId),
+                'studentNumber' => (string) ($this->pick($data, ['StudentNo', 'studentNo', 'studentNumber', 'StudentNumber']) ?? ''),
+                'firstName' => (string) ($this->pick($data, ['FirstName', 'firstName']) ?? ''),
+                'lastName' => (string) ($this->pick($data, ['LastName', 'lastName']) ?? ''),
+                'middleName' => (string) ($this->pick($data, ['MiddleName', 'middleName']) ?? ''),
+                'course' => (string) ($this->pick($data, ['Course', 'course']) ?? ''),
             ], null];
         } catch (\Throwable $ex) {
-            return [null, 'MIS is currently unavailable. Please try again.'];
+            Log::warning('Student database lookup failed.', [
+                'url' => $url,
+                'error' => $ex->getMessage(),
+            ]);
+
+            $message = $ex->getMessage();
+            $detail = 'connection failed';
+            if (str_contains($message, 'cURL error 28') || str_contains($message, 'timed out')) {
+                $detail = 'connection timed out';
+            } elseif (str_contains($message, 'cURL error 6') || str_contains($message, 'Could not resolve host')) {
+                $detail = 'host could not be resolved';
+            } elseif (str_contains($message, 'cURL error 60') || str_contains($message, 'SSL')) {
+                $detail = 'SSL/certificate error';
+            } elseif (str_contains($message, 'cURL error 7') || str_contains($message, 'Connection refused')) {
+                $detail = 'connection refused';
+            }
+
+            return [null, 'Student Database is currently unavailable ('.$detail.').'];
         }
     }
 

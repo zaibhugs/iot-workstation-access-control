@@ -30,6 +30,8 @@ class SettingController extends Controller
         // Show the value that is actually in use: the saved override when
         // present, otherwise the MIS_API_BASE_URL fallback from .env.
         $studentApiUrl = $this->mis->baseUrl();
+        $studentApiPath = $this->mis->studentPath();
+        $studentApiKey = $this->mis->apiKey();
 
         // Resolved endpoint with the {cardId} placeholder kept visible.
         $currentEndpoint = $this->mis->endpointFor();
@@ -61,6 +63,8 @@ class SettingController extends Controller
             'admin.settings.index',
             compact(
                 'studentApiUrl',
+                'studentApiPath',
+                'studentApiKey',
                 'currentEndpoint',
                 'staleSessionMinutes',
                 'noPresenceTimeoutSeconds',
@@ -95,7 +99,42 @@ class SettingController extends Controller
         if ($section === null || $section === 'mis') {
             $rules['student_api_url'] = [
                 'required',
-                'url',
+                'string',
+                'max:500',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $url = trim((string) $value);
+                    $urlForValidation = str_replace(['{cardId}', '{cardNo}'], 'SAMPLE_CARD_ID', $url);
+                    if (filter_var($urlForValidation, FILTER_VALIDATE_URL) === false) {
+                        $fail('The student database URL must be a valid URL.');
+                    }
+                },
+            ];
+
+            $rules['student_api_path'] = [
+                'required',
+                'string',
+                'max:500',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    $path = trim((string) $value);
+                    if ($path === '') {
+                        $fail('The student lookup path is required.');
+
+                        return;
+                    }
+                    if (! str_contains($path, '{cardId}') && ! str_contains($path, '{cardNo}')) {
+                        $fail('The student lookup path must include {cardId} or {cardNo}.');
+
+                        return;
+                    }
+                    if (preg_match('/\s/', $path)) {
+                        $fail('The student lookup path must not contain spaces.');
+                    }
+                },
+            ];
+
+            $rules['mis_api_key'] = [
+                'nullable',
+                'string',
                 'max:500',
             ];
         }
@@ -106,6 +145,18 @@ class SettingController extends Controller
                 'integer',
                 'min:1',
                 'max:1440',
+            ];
+
+            $rules['student_single_session_only'] = [
+                'nullable',
+                'boolean',
+            ];
+
+            $rules['student_max_concurrent_sessions'] = [
+                'nullable',
+                'integer',
+                'min:0',
+                'max:50',
             ];
         }
 
@@ -142,18 +193,6 @@ class SettingController extends Controller
                 'string',
                 'max:50',
             ];
-
-            $rules['student_single_session_only'] = [
-                'nullable',
-                'boolean',
-            ];
-
-            $rules['student_max_concurrent_sessions'] = [
-                'nullable',
-                'integer',
-                'min:0',
-                'max:50',
-            ];
         }
 
         $validated = $request->validate($rules);
@@ -164,8 +203,34 @@ class SettingController extends Controller
             $values['student_api_url'] = trim($validated['student_api_url']);
         }
 
+        if (array_key_exists('student_api_path', $validated)) {
+            $path = trim((string) $validated['student_api_path']);
+            if ($path !== '' && ! str_starts_with($path, '/') && ! str_starts_with($path, 'http://') && ! str_starts_with($path, 'https://')) {
+                $path = '/'.$path;
+            }
+            $values['student_api_path'] = $path;
+        }
+
+        if ($section === null || $section === 'mis') {
+            $values['mis_api_key'] = trim((string) $request->input('mis_api_key', ''));
+        }
+
         if (array_key_exists('stale_session_minutes', $validated)) {
             $values['stale_session_minutes'] = (string) $validated['stale_session_minutes'];
+        }
+
+        if ($section === null || $section === 'sessions') {
+            $singleOnly = $request->boolean('student_single_session_only');
+            $maxSessions = (int) $request->input('student_max_concurrent_sessions', 2);
+            if ($maxSessions < 0) {
+                $maxSessions = 0;
+            }
+            if (! $singleOnly && $maxSessions === 1) {
+                $maxSessions = 2;
+            }
+
+            $values['student_single_session_only'] = $singleOnly ? '1' : '0';
+            $values['student_max_concurrent_sessions'] = (string) $maxSessions;
         }
 
         if (array_key_exists('client_no_presence_timeout_seconds', $validated)) {
@@ -185,18 +250,6 @@ class SettingController extends Controller
                 $request->boolean('client_disable_task_manager') ? '1' : '0';
 
             $values[ClientSettings::ADMIN_PIN_KEY] = trim((string) $request->input('client_admin_pin', ''));
-
-            $singleOnly = $request->boolean('student_single_session_only');
-            $maxSessions = (int) $request->input('student_max_concurrent_sessions', 2);
-            if ($maxSessions < 0) {
-                $maxSessions = 0;
-            }
-            if (! $singleOnly && $maxSessions === 1) {
-                $maxSessions = 2;
-            }
-
-            $values['student_single_session_only'] = $singleOnly ? '1' : '0';
-            $values['student_max_concurrent_sessions'] = (string) $maxSessions;
         }
 
         DB::transaction(function () use ($values) {
