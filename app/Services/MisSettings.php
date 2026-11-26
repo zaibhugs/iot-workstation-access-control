@@ -64,13 +64,12 @@ class MisSettings
 
     public function apiKey(): string
     {
-        $value = $this->setting(self::API_KEY_KEY);
-
-        if ($value === '') {
-            $value = (string) config('services.mis.key', '');
+        $this->setting(self::URL_KEY); // ensure cache loaded
+        if (is_array($this->cache) && array_key_exists(self::API_KEY_KEY, $this->cache)) {
+            return trim((string) $this->cache[self::API_KEY_KEY]);
         }
 
-        return trim($value);
+        return trim((string) config('services.mis.key', ''));
     }
 
     public function timeout(): float
