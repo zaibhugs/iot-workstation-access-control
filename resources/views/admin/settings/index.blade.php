@@ -11,7 +11,7 @@
             'icon' => 'bolt',
         ],
         'mis' => [
-            'label' => 'MIS / UISA API',
+            'label' => 'Student Database / API',
             'icon' => 'globe',
         ],
         'sessions' => [
@@ -431,12 +431,11 @@
                 <div>
 
                     <h2 class="text-lg font-bold text-gray-900">
-                        MIS / Library System
+                        Student Database Connection / API
                     </h2>
 
                     <p class="mt-1 max-w-xl text-sm leading-6 text-gray-500">
-                        API address used for RFID student lookups against the university MIS
-                        or the simulated Library database.
+                        API address used for RFID student lookups against the specified student database (for example, University ISA).
                     </p>
 
                 </div>
@@ -632,7 +631,7 @@
                     </div>
                     <div>
                         <h3 class="text-sm font-semibold text-gray-900">Test RFID Lookup</h3>
-                        <p class="mt-1 text-xs leading-5 text-gray-500">Test the currently configured MIS/UISA endpoint by entering an RFID card UID.</p>
+                        <p class="mt-1 text-xs leading-5 text-gray-500">Test the currently configured Student Database endpoint by entering an RFID card UID.</p>
                     </div>
                 </div>
 
