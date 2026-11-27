@@ -63,6 +63,7 @@
     @if (session('success'))
 
         <div
+            id="settings-success-alert"
             class="mb-6 flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4"
             role="alert"
         >
@@ -74,7 +75,7 @@
             </div>
 
 
-            <div>
+            <div class="min-w-0 flex-1">
 
                 <p class="text-sm font-semibold text-emerald-800">
                     Settings updated
@@ -85,6 +86,15 @@
                 </p>
 
             </div>
+
+            <button
+                type="button"
+                data-dismiss-alert="settings-success-alert"
+                class="shrink-0 rounded-lg p-1.5 text-emerald-500 transition hover:bg-emerald-100 hover:text-emerald-700"
+                aria-label="Dismiss"
+            >
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/></svg>
+            </button>
 
         </div>
 
@@ -710,35 +720,28 @@
 
             <input type="hidden" name="section" value="sessions">
 
-
             <div class="mb-8 flex items-start gap-4">
-
-                <div
-                    class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600"
-                >
-                    <x-icon name="exclamation-triangle" class="h-5 w-5" />
+                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                    <x-icon name="clock" class="h-5 w-5" />
                 </div>
-
-
                 <div>
-
-                    <h2 class="text-lg font-bold text-gray-900">
-                        Session Cleanup
-                    </h2>
-
+                    <h2 class="text-lg font-bold text-gray-900">Session Settings</h2>
                     <p class="mt-1 max-w-xl text-sm leading-6 text-gray-500">
-                        Sessions on workstations that stop reporting a heartbeat are closed
-                        automatically and marked as "did not log out manually".
+                        Manage how student sessions are limited across workstations and how inactive sessions are cleaned up automatically.
                     </p>
-
                 </div>
-
             </div>
-            <div class="space-y-8">
+
+            <div class="space-y-6">
                 <div class="rounded-2xl border border-gray-100 bg-gray-50/40 p-5 sm:p-6">
-                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div class="mb-5">
+                        <p class="text-sm font-semibold text-gray-900">Student Session Limit</p>
+                        <p class="mt-1 text-sm leading-6 text-gray-500">Control how many workstations the same student/card can use at the same time.</p>
+                    </div>
+
+                    <div class="flex flex-col gap-4 rounded-xl border border-gray-100 bg-white p-4 sm:flex-row sm:items-start sm:justify-between sm:p-5">
                         <div class="max-w-xl">
-                            <p class="text-sm font-semibold text-gray-900">Limit student to 1 PC session</p>
+                            <p class="text-sm font-medium text-gray-900">Limit student to 1 PC session</p>
                             <p class="mt-1 text-sm leading-6 text-gray-500">When enabled, the same student/card can only be active on one PC at a time.</p>
                         </div>
                         <label class="inline-flex cursor-pointer items-center gap-3 self-start">
@@ -749,7 +752,7 @@
                         </label>
                     </div>
 
-                    <div id="student_max_concurrent_sessions_wrap" class="{{ old('student_single_session_only', $studentSingleSessionOnly ?? true) ? 'hidden' : '' }} mt-5 border-t border-gray-200/80 pt-5">
+                    <div id="student_max_concurrent_sessions_wrap" class="{{ old('student_single_session_only', $studentSingleSessionOnly ?? true) ? 'hidden' : '' }} mt-4 rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
                         <label for="student_max_concurrent_sessions" class="mb-2 block text-sm font-medium text-gray-900">Max PCs per student/card</label>
                         <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
                             <input type="hidden" id="student_max_concurrent_sessions_value" name="student_max_concurrent_sessions" value="{{ old('student_max_concurrent_sessions', $studentMaxConcurrentSessions ?? 2) }}">
@@ -759,7 +762,7 @@
                                 min="2"
                                 max="50"
                                 value="{{ old('student_max_concurrent_sessions', ($studentMaxConcurrentSessions ?? 2) === 0 ? 2 : ($studentMaxConcurrentSessions ?? 2)) }}"
-                                class="block w-full max-w-[180px] rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-50"
+                                class="block w-full max-w-[180px] rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-900 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
                             >
                             <label class="inline-flex cursor-pointer items-center gap-2 text-sm text-gray-600">
                                 <input id="student_max_concurrent_sessions_unlimited" type="checkbox" {{ (string) old('student_max_concurrent_sessions', $studentMaxConcurrentSessions ?? 2) === '0' ? 'checked' : '' }} class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
@@ -770,106 +773,83 @@
                     </div>
                 </div>
 
-                <div>
-                    <label
-                        for="stale_session_minutes"
-                        class="mb-2.5 block text-sm font-semibold text-gray-900"
-                    >
-                        Stale Session Threshold
-                        <span class="text-red-500">*</span>
-                    </label>
-
-
-                <div class="relative max-w-md">
-
-                    <div
-                        class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5"
-                    >
-                        <x-icon name="clock" class="h-5 w-5 text-gray-400" />
+                <div class="rounded-2xl border border-gray-100 bg-gray-50/40 p-5 sm:p-6">
+                    <div class="mb-5">
+                        <p class="text-sm font-semibold text-gray-900">Stale Session Cleanup</p>
+                        <p class="mt-1 text-sm leading-6 text-gray-500">Automatically close sessions when a workstation stops reporting a heartbeat.</p>
                     </div>
 
-
-                    <input
-                        type="number"
-                        id="stale_session_minutes"
-                        name="stale_session_minutes"
-                        min="1"
-                        max="1440"
-                        step="1"
-                        value="{{ old('stale_session_minutes', $staleSessionMinutes ?? 5) }}"
-                        required
-                        class="block w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-24 text-sm font-semibold text-gray-900 transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
-                    >
-
-
-                    <div
-                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4"
-                    >
-                        <span
-                            class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-medium text-gray-500"
+                    <div class="rounded-xl border border-gray-100 bg-white p-4 sm:p-5">
+                        <label
+                            for="stale_session_minutes"
+                            class="mb-2.5 block text-sm font-medium text-gray-900"
                         >
-                            minutes
-                        </span>
+                            Stale Session Threshold
+                            <span class="text-red-500">*</span>
+                        </label>
+
+                        <div class="relative max-w-md">
+                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
+                                <x-icon name="clock" class="h-5 w-5 text-gray-400" />
+                            </div>
+
+                            <input
+                                type="number"
+                                id="stale_session_minutes"
+                                name="stale_session_minutes"
+                                min="1"
+                                max="1440"
+                                step="1"
+                                value="{{ old('stale_session_minutes', $staleSessionMinutes ?? 5) }}"
+                                required
+                                class="block w-full rounded-xl border border-gray-200 bg-gray-50 py-3 pl-11 pr-24 text-sm font-semibold text-gray-900 transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                            >
+
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4">
+                                <span class="rounded-lg bg-gray-100 px-2 py-1 text-xs font-medium text-gray-500">
+                                    minutes
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="mt-2.5 flex flex-wrap items-center gap-1.5">
+                            @foreach ([['3 min', 3], ['5 min', 5], ['10 min', 10]] as [$presetLabel, $presetValue])
+                                <button
+                                    type="button"
+                                    data-preset-target="stale_session_minutes"
+                                    data-preset-value="{{ $presetValue }}"
+                                    class="rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-medium text-gray-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+                                >
+                                    {{ $presetLabel }}
+                                </button>
+                            @endforeach
+                        </div>
+
+                        @error('stale_session_minutes')
+                            <p class="mt-2 text-xs font-medium text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                        <p class="mt-2 max-w-xl text-xs leading-5 text-gray-400">
+                            The workstation client sends a heartbeat every 60 seconds. Five minutes tolerates short network drops while clearing ghost sessions quickly. Allowed 1 to 1,440 minutes.
+                        </p>
                     </div>
-
-                </div>
-
-
-                <div class="mt-2.5 flex flex-wrap items-center gap-1.5">
-
-                    @foreach ([['3 min', 3], ['5 min', 5], ['10 min', 10]] as [$presetLabel, $presetValue])
-
-                        <button
-                            type="button"
-                            data-preset-target="stale_session_minutes"
-                            data-preset-value="{{ $presetValue }}"
-                            class="rounded-lg border border-gray-200 bg-white px-2.5 py-1 text-[11px] font-medium text-gray-600 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
-                        >
-                            {{ $presetLabel }}
-                        </button>
-
-                    @endforeach
-
-                </div>
-
-
-                @error('stale_session_minutes')
-
-                    <p class="mt-2 text-xs font-medium text-red-600">
-                        {{ $message }}
-                    </p>
-
-                @enderror
-
-
-                <p class="mt-2 max-w-xl text-xs leading-5 text-gray-400">
-                    The workstation client sends a heartbeat every 60 seconds. Five minutes tolerates short
-                    network drops while clearing ghost sessions quickly. Allowed 1 to 1,440
-                    minutes.
-                </p>
-
                 </div>
             </div>
 
-
-            <div
-                class="mt-8 flex flex-col gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:justify-between"
-            >
-
+            <div class="mt-8 flex flex-col gap-3 border-t border-gray-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-xs text-gray-400">
-                    Applies on the next session check.
+                    Changes apply on the next session check.
                 </p>
-
 
                 <button
                     type="submit"
                     class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-200 transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100"
                 >
                     <x-icon name="save-floppy" class="h-5 w-5" />
-
                     Save Session Settings
                 </button>
-
             </div>
 
         </form>
@@ -881,6 +861,13 @@
 
 <script>
     (() => {
+        document.querySelectorAll('[data-dismiss-alert]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const alert = document.getElementById(button.dataset.dismissAlert);
+                if (alert) alert.remove();
+            });
+        });
+
         const tabs = Array.from(document.querySelectorAll('[data-settings-tab]'));
         const panels = Array.from(document.querySelectorAll('[data-settings-panel]'));
 
