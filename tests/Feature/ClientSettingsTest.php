@@ -83,6 +83,7 @@ it('shows and saves the client behavior settings from the admin page', function 
 
     $this->actingAs($admin)
         ->put(route('settings.update'), [
+            'section' => 'client',
             'student_api_url' => 'http://localhost:5080',
             'stale_session_minutes' => 5,
             'client_no_presence_timeout_seconds' => 600,

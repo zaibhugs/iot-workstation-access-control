@@ -15,11 +15,19 @@ use Illuminate\Support\Facades\Log;
  */
 class MisStudentLookup
 {
+    public const CODE_CARD_NOT_REGISTERED = 'card_not_registered';
+
+    public const CODE_DATABASE_UNAVAILABLE = 'student_database_unavailable';
+
+    public const CODE_DATABASE_CONFIGURATION = 'student_database_configuration_error';
+
+    public const CODE_DATABASE_UNEXPECTED_RESPONSE = 'student_database_unexpected_response';
+
     public function __construct(private MisSettings $settings) {}
 
     /**
-     * @return array{0: array<string, string>|null, 1: string|null}
-     *                                                              [student, reason]. A null student always has a reason.
+     * @return array{0: array<string, string>|null, 1: string|null, 2: string|null}
+     *                                                                              [student, reason, code]. A null student always has a reason.
      */
     public function lookup(string $cardId): array
     {
@@ -37,21 +45,25 @@ class MisStudentLookup
             $response = $request->get($url);
 
             if ($response->notFound()) {
-                return [null, 'Card is not registered in the university MIS.'];
+                return [null, 'Card is not registered in the university MIS.', self::CODE_CARD_NOT_REGISTERED];
             }
 
             if ($response->unauthorized() || $response->forbidden()) {
-                return [null, 'Student Database rejected the API key.'];
+                return [null, 'Student Database rejected the API key.', self::CODE_DATABASE_CONFIGURATION];
             }
 
             if (! $response->successful()) {
-                return [null, 'Student Database returned an unexpected response (HTTP '.$response->status().').'];
+                return [
+                    null,
+                    'Student Database returned an unexpected response (HTTP '.$response->status().').',
+                    self::CODE_DATABASE_UNEXPECTED_RESPONSE,
+                ];
             }
 
             $data = $this->unwrap($response->json() ?? []);
 
             if (! is_array($data)) {
-                return [null, 'Student Database returned an unexpected response.'];
+                return [null, 'Student Database returned an unexpected response.', self::CODE_DATABASE_UNEXPECTED_RESPONSE];
             }
 
             return [[
@@ -62,7 +74,7 @@ class MisStudentLookup
                 'middleName' => (string) ($this->pick($data, ['MiddleName', 'middleName']) ?? ''),
                 'course' => (string) ($this->pick($data, ['Course', 'course']) ?? ''),
                 'sex' => (string) ($this->pick($data, ['Sex', 'sex', 'Gender', 'gender']) ?? ''),
-            ], null];
+            ], null, null];
         } catch (\Throwable $ex) {
             Log::warning('Student database lookup failed.', [
                 'url' => $url,
@@ -81,7 +93,7 @@ class MisStudentLookup
                 $detail = 'connection refused';
             }
 
-            return [null, 'Student Database is currently unavailable ('.$detail.').'];
+            return [null, 'Student Database is currently unavailable ('.$detail.').', self::CODE_DATABASE_UNAVAILABLE];
         }
     }
 

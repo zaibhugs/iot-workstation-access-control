@@ -18,13 +18,13 @@ function fakeMis(array $payload): void
 
 it('stores the MIS student number, not the RFID UID, as the student identity', function () {
     fakeMis([
-        'StudentNo'  => '2310111-1',
-        'LastName'   => 'DELA CRUZ',
-        'FirstName'  => 'Juan',
+        'StudentNo' => '2310111-1',
+        'LastName' => 'DELA CRUZ',
+        'FirstName' => 'Juan',
         'MiddleName' => 'Reyes',
-        'Sex'        => '',
-        'Course'     => 'BSIT',
-        'CardNo'     => '04A3B2C1',
+        'Sex' => '',
+        'Course' => 'BSIT',
+        'CardNo' => '04A3B2C1',
     ]);
 
     sessionTestDevice();
@@ -32,7 +32,7 @@ it('stores the MIS student number, not the RFID UID, as the student identity', f
     $this->withHeader('X-Device-Token', 'test-token')
         ->postJson('/api/access/scan', [
             'rfid_uid' => '04A3B2C1',
-            'pc_port'  => 1,
+            'pc_port' => 1,
         ])
         ->assertOk()
         ->assertJson(['allowed' => true]);
@@ -47,8 +47,8 @@ it('does not fall back to the RFID UID when the MIS returns no student number', 
     fakeMis([
         'LastName' => 'DELA CRUZ',
         'FirstName' => 'Juan',
-        'Course'   => 'BSIT',
-        'CardNo'   => '04A3B2C1',
+        'Course' => 'BSIT',
+        'CardNo' => '04A3B2C1',
     ]);
 
     sessionTestDevice();
@@ -56,7 +56,7 @@ it('does not fall back to the RFID UID when the MIS returns no student number', 
     $this->withHeader('X-Device-Token', 'test-token')
         ->postJson('/api/access/scan', [
             'rfid_uid' => '04A3B2C1',
-            'pc_port'  => 1,
+            'pc_port' => 1,
         ])
         ->assertOk()
         ->assertJson(['allowed' => true]);
@@ -72,17 +72,17 @@ it('shows the student number, not the RFID UID, on the monitoring page', functio
     $user = User::factory()->create();
 
     PcAccessLogs::create([
-        'occurred_at'         => now(),
-        'received_at'         => now(),
-        'rfid_uid'            => '04A3B2C1',
-        'device_id'           => $device->id,
-        'event_type'          => 'time_in',
-        'result'              => 'allowed',
-        'reason'              => 'Authorized',
-        'session_id'          => 'test-session',
+        'occurred_at' => now(),
+        'received_at' => now(),
+        'rfid_uid' => '04A3B2C1',
+        'device_id' => $device->id,
+        'event_type' => 'time_in',
+        'result' => 'allowed',
+        'reason' => 'Authorized',
+        'session_id' => 'test-session',
         'student_external_id' => '2310111-1',
-        'student_name'        => 'DELA CRUZ, Juan',
-        'course'              => 'BSIT',
+        'student_name' => 'DELA CRUZ, Juan',
+        'course' => 'BSIT',
     ]);
 
     $this->actingAs($user)
@@ -90,4 +90,73 @@ it('shows the student number, not the RFID UID, on the monitoring page', functio
         ->assertOk()
         ->assertSee('2310111-1')
         ->assertDontSee('04A3B2C1');
+});
+
+it('returns a stable code when the card is not registered', function () {
+    Http::fake([
+        '*' => Http::response(['error' => 'not registered'], 404),
+    ]);
+
+    sessionTestDevice();
+
+    $this->withHeader('X-Device-Token', 'test-token')
+        ->postJson('/api/access/scan', [
+            'rfid_uid' => '04A3B2C1',
+            'pc_port' => 1,
+        ])
+        ->assertOk()
+        ->assertJson([
+            'allowed' => false,
+            'code' => 'card_not_registered',
+        ]);
+});
+
+it('returns a stable code when the student database is unavailable', function () {
+    Http::fake([
+        '*' => Http::response('', 500),
+    ]);
+
+    sessionTestDevice();
+
+    $this->withHeader('X-Device-Token', 'test-token')
+        ->postJson('/api/access/scan', [
+            'rfid_uid' => '04A3B2C1',
+            'pc_port' => 1,
+        ])
+        ->assertOk()
+        ->assertJson([
+            'allowed' => false,
+            'code' => 'student_database_unexpected_response',
+        ]);
+});
+
+it('returns a stable code when the student already has a session on another PC', function () {
+    fakeMis([
+        'StudentNo' => '2024-0001',
+        'LastName' => 'DELA CRUZ',
+        'FirstName' => 'Juan',
+        'MiddleName' => 'Reyes',
+        'Sex' => '',
+        'Course' => 'BSIT',
+        'CardNo' => '04A3B2C1',
+    ]);
+
+    $firstDevice = sessionTestDevice();
+    sessionTestStart($firstDevice);
+
+    sessionTestDevice([
+        'workstation_name' => 'Second Workstation',
+        'api_token' => 'second-token',
+    ]);
+
+    $this->withHeader('X-Device-Token', 'second-token')
+        ->postJson('/api/access/scan', [
+            'rfid_uid' => '04A3B2C1',
+            'pc_port' => 1,
+        ])
+        ->assertOk()
+        ->assertJson([
+            'allowed' => false,
+            'code' => 'session_limit_reached',
+        ]);
 });

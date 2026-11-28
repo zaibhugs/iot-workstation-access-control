@@ -1,67 +1,51 @@
 <style>
-    
-    * {
-        box-sizing: border-box;
-    }
-    
-    html, body {
-        margin: 0;
-        padding: 0;
+    .olh-report-header {
+        margin: 0 0 8px 0;
         width: 100%;
-        font-family: Aptos, sans-serif;
+        font-family: DejaVu Sans, sans-serif;
     }
-    
-    .header-wrapper {
-        width: 78%;
-        margin: 0 auto;
-        padding-top: 10px;
-    }
-    
-    .logos-row {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 18px;
-        margin-bottom: 6px;
-    }
-    
-    .slsu-logo {
-        height: 90px;
-        width: auto;
-    }
-    
-    .bagong-pilipinas-logo {
-        height: 70px;
-        width: auto;
-        position: relative;
-        top: -8px;
-    }
-    
-    
-    .core-values-box {
+
+    .olh-logo-table {
+        border-collapse: collapse;
+        table-layout: fixed;
         width: 100%;
-        border-bottom: 1.5px solid #000;
+    }
+
+    .olh-logo-cell {
+        padding: 0 10px;
         text-align: center;
-        padding-bottom: 4px;
+        vertical-align: middle;
     }
-    
-    
-    .core-values-text {
-        font-size: 8px; 
-        white-space: nowrap; 
+
+    .olh-logo-left img {
+        height: 70px;
+    }
+
+    .olh-logo-right img {
+        height: 55px;
+    }
+
+    .olh-core-values {
+        border-bottom: 1.5px solid #000;
         color: #000;
+        font-size: 7.5px;
+        padding: 4px 0 5px;
+        text-align: center;
     }
 </style>
 
-<div class="header-wrapper">
-    <div class="logos-row">
-    
-        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('image/slsu.png'))) }}" class="slsu-logo" alt="SLSU Logo">
-        <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('image/bagong_pilipinas.jpeg'))) }}" class="bagong-pilipinas-logo" alt="Bagong Pilipinas Logo">
-    </div>
-
-    
-    <div class="core-values-box">
-        <div class="core-values-text">Excellence | Service | Leadership and Good Governance | Innovation | Social Responsibility | Integrity | Professionalism | Spirituality</div>
-    </div>
-</div>
+<table class="olh-report-header">
+    <tr>
+        <td class="olh-logo-cell olh-logo-left">
+            <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('image/slsu.png'))) }}" alt="SLSU Logo">
+        </td>
+        <td class="olh-logo-cell olh-logo-right">
+            <img src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('image/bagong_pilipinas.jpeg'))) }}" alt="Bagong Pilipinas Logo">
+        </td>
+    </tr>
+    <tr>
+        <td class="olh-core-values" colspan="2">
+            Excellence | Service | Leadership and Good Governance | Innovation | Social Responsibility | Integrity | Professionalism | Spirituality
+        </td>
+    </tr>
+</table>

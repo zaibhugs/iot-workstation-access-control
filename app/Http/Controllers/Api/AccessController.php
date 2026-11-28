@@ -56,7 +56,7 @@ class AccessController extends Controller
      *
      * Response:
      *   200 {"allowed":true,  "session_id":"...", "student":{...}}
-     *   200 {"allowed":false, "reason":"Card is not registered."}
+     *   200 {"allowed":false, "reason":"...", "code":"...", "hint":"..."}
      *
      * The device is resolved by the `device.auth` middleware and lives in
      * $request->authenticated_device.
@@ -76,7 +76,7 @@ class AccessController extends Controller
             ? \Illuminate\Support\Carbon::parse($validated['occurred_at'])
             : now();
 
-        [$student, $reason] = $this->mis->lookup($cardId);
+        [$student, $reason, $misCode] = $this->mis->lookup($cardId);
 
         if ($student === null) {
             $this->writeLog([
@@ -88,9 +88,15 @@ class AccessController extends Controller
                 'reason' => $reason,
             ]);
 
+            $hint = $misCode === MisStudentLookup::CODE_CARD_NOT_REGISTERED
+                ? 'This card is not listed in the Student Database. Please see a librarian.'
+                : "We can't check this card right now. Please try again in a moment.";
+
             return response()->json([
                 'allowed' => false,
                 'reason' => $reason,
+                'code' => $misCode ?? MisStudentLookup::CODE_DATABASE_UNAVAILABLE,
+                'hint' => $hint,
             ], Response::HTTP_OK);
         }
 
@@ -128,6 +134,8 @@ class AccessController extends Controller
                     return response()->json([
                         'allowed' => false,
                         'reason' => $reason,
+                        'code' => 'session_limit_reached',
+                        'hint' => 'End the session on the other PC, then scan again.',
                     ], Response::HTTP_OK);
                 }
             }

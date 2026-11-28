@@ -281,58 +281,9 @@ class ReportsController extends Controller
 
     public function previewPdf(Request $request)
     {
-        $logs = $this
-            ->filteredLogsQuery(
-                $request
-            )
-            ->orderBy(
-                'pc_access_logs.occurred_at',
-                'asc'
-            )
-            ->get();
-
-        return Pdf::view(
-            'admin.reports.AccessLogReport.pdf',
-            [
-                'logs' => $logs,
-
-                'columns' => $this->selectedColumns(
-                    $request
-                ),
-
-                'filters' => $request->only([
-                'search',
-                'date_from',
-                'date_to',
-                'course',
-                'device',
-                'event',
-                'result',
-                'reason',
-                ]),
-
-                'generatedAt' => now(),
-            ]
-        )
-            ->headerView(
-                'admin.reports.AccessLogReport.header'
-            )
-            ->footerView(
-                'admin.reports.AccessLogReport.footer'
-            )
-            ->margins(
-                45,
-                15,
-                35,
-                15,
-                Unit::Millimeter
-            )
-            ->format(
-                Format::A4
-            )
-            ->inline(
-                'access-report-preview.pdf'
-            );
+        return $this
+            ->reportPdf($request)
+            ->inline('access-report-preview.pdf');
     }
 
     /*
@@ -355,40 +306,42 @@ class ReportsController extends Controller
             )
             ->get();
 
+        $pages = $this->paginateReportRows(
+            $logs,
+            16,
+            20
+        );
+
         return Pdf::view(
             'admin.reports.AccessLogReport.pdf',
             [
                 'logs' => $logs,
+
+                'pages' => $pages,
 
                 'columns' => $this->selectedColumns(
                     $request
                 ),
 
                 'filters' => $request->only([
-                'search',
-                'date_from',
-                'date_to',
-                'course',
-                'device',
-                'event',
-                'result',
-                'reason',
+                    'search',
+                    'date_from',
+                    'date_to',
+                    'course',
+                    'device',
+                    'event',
+                    'result',
+                    'reason',
                 ]),
 
                 'generatedAt' => now(),
             ]
         )
-            ->headerView(
-                'admin.reports.AccessLogReport.header'
-            )
-            ->footerView(
-                'admin.reports.AccessLogReport.footer'
-            )
             ->margins(
-                45,
-                15,
-                35,
-                15,
+                14,
+                12,
+                14,
+                12,
                 Unit::Millimeter
             )
             ->format(
@@ -828,10 +781,18 @@ class ReportsController extends Controller
 
         $analytics = $this->studentSummaryAnalytics($filters, $students);
 
+        $pages = $this->paginateReportRows(
+            $students,
+            12,
+            22
+        );
+
         return Pdf::view(
             'admin.reports.SummaryReport.pdf',
             array_merge([
                 'students' => $students,
+
+                'pages' => $pages,
 
                 'filters' => $filters,
 
@@ -840,34 +801,77 @@ class ReportsController extends Controller
                 'generatedAt' => now(),
             ], $analytics)
         )
-            /*
-            |--------------------------------------------------------------------------
-            | Separate Summary Report Header / Footer
-            |--------------------------------------------------------------------------
-            |
-            | Create:
-            |
-            | admin/reports/SummaryReport/header.blade.php
-            | admin/reports/SummaryReport/footer.blade.php
-            |
-            */
-
-            ->headerView(
-                'admin.reports.SummaryReport.header'
-            )
-            ->footerView(
-                'admin.reports.SummaryReport.footer'
-            )
             ->margins(
-                45,
+                14,
                 12,
-                35,
+                14,
                 12,
                 Unit::Millimeter
             )
             ->format(
                 Format::A4
             );
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | PDF ROW PAGINATION
+    |--------------------------------------------------------------------------
+    |
+    | DOMPDF cannot repeat HTML headers and footers by itself, so each report
+    | page renders its own header/footer and we add explicit page breaks.
+    |
+    */
+
+    private function paginateReportRows(
+        $rows,
+        int $firstPageSize,
+        int $pageSize
+    ): array {
+
+        $rows = collect($rows)->values();
+
+        if ($rows->isEmpty()) {
+            return [[
+                'number' => 1,
+                'total' => 1,
+                'rows' => [],
+            ]];
+        }
+
+        $pages = [];
+        $offset = 0;
+
+        while ($offset < $rows->count()) {
+
+            $size = $pages === [] ? $firstPageSize : $pageSize;
+
+            $slice = $rows
+                ->slice($offset, $size)
+                ->values();
+
+            $pages[] = [
+                'number' => count($pages) + 1,
+                'rows' => $slice
+                    ->map(fn ($row, $index) => [
+                        'data' => $row,
+                        'number' => $offset + $index + 1,
+                    ])
+                    ->all(),
+            ];
+
+            $offset += $slice->count();
+        }
+
+        $total = count($pages);
+
+        foreach ($pages as &$page) {
+            $page['total'] = $total;
+        }
+
+        unset($page);
+
+        return $pages;
     }
 
     /*

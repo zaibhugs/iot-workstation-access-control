@@ -50,13 +50,13 @@ it('routes RFID lookups through the saved MIS URL', function () {
 
     Http::fake([
         '*' => Http::response([
-            'StudentNo'  => '2310111-1',
-            'LastName'   => 'DELA CRUZ',
-            'FirstName'  => 'Juan',
+            'StudentNo' => '2310111-1',
+            'LastName' => 'DELA CRUZ',
+            'FirstName' => 'Juan',
             'MiddleName' => 'Reyes',
-            'Sex'        => '',
-            'Course'     => 'BSIT',
-            'CardNo'     => '04A3B2C1',
+            'Sex' => '',
+            'Course' => 'BSIT',
+            'CardNo' => '04A3B2C1',
         ], 200),
     ]);
 
@@ -86,6 +86,7 @@ it('saves the MIS URL and applies it without a config cache clear', function () 
     $this->actingAs($admin)
         ->put(route('settings.update'), [
             'student_api_url' => 'https://uisa.example.edu/mis',
+            'student_api_path' => '/api/students/{cardId}',
             'stale_session_minutes' => 5,
             'client_no_presence_timeout_seconds' => 300,
             'client_inactivity_warning_seconds' => 10,

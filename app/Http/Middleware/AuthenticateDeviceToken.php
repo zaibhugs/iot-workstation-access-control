@@ -16,24 +16,26 @@ class AuthenticateDeviceToken
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token=$request->header('X-Device-Token');
-        if (!$token ) {
+        $token = $request->header('X-Device-Token');
+        if (! $token) {
             return response()->json([
                 'success' => false,
+                'code' => 'device_not_paired',
                 'message' => 'Device token is required',
             ], 401);
         }
 
-        $device = Device::where('api_token',$token)->first();
+        $device = Device::where('api_token', $token)->first();
 
-
-        if (!$device || !$device->isTokenValid()){
+        if (! $device || ! $device->isTokenValid()) {
             return response()->json([
-                'success'=>false,
-                'message'=>'Access Denied: Invalid or expired device token.'
+                'success' => false,
+                'code' => 'device_not_paired',
+                'message' => 'Access Denied: Invalid or expired device token.',
             ], 401);
         }
         $request->merge(['authenticated_device' => $device]);
+
         return $next($request);
     }
 }

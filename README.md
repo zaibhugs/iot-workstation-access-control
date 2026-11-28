@@ -63,9 +63,9 @@ An enterprise-grade IoT access control, workstation monitoring, and analytics pl
   - **Top 3 Courses by Logins**: Highlights high-traffic academic programs.
   - **Top 3 Courses by Accumulated Usage Time**: Quantifies academic computer lab utilization.
 - **Institutional PDF Generation**:
-  - Headless Chromium vector PDF rendering powered by Spatie Laravel PDF and Puppeteer.
-  - Official university header (Southern Leyte State University / Bagong Pilipinas) and ISO 9001 / QS-Stars rated footer certification.
-  - Resolution-independent inline SVG donut graphs and color-coded leaderboard summaries.
+  - Pure-PHP DOMPDF rendering powered by Spatie Laravel PDF; no Node.js, Chrome, or Docker required on shared hosting.
+  - Official university header (Southern Leyte State University / Bagong Pilipinas) and ISO 9001 / QS-Stars rated footer repeated on every PDF page.
+  - Manually paginated report pages with `Page X of Y` counters, inline SVG donut graphs, and color-coded leaderboard summaries.
 
 ---
 
@@ -88,7 +88,7 @@ graph TD
         SESSION["Session Lifecycle Service"]
         DB[("MySQL Database")]
         WEB["Admin Portal & Reporting Engine"]
-        PDF["Headless PDF Engine (Chromium)"]
+        PDF["DOMPDF PDF Engine (Pure PHP)"]
     end
 
     CLIENT -->|"1. POST /api/access/scan"| API
@@ -115,7 +115,7 @@ graph TD
 | **Frontend UI** | [Tailwind CSS v4](https://tailwindcss.com) + [Flowbite](https://flowbite.com) | Modern utility-first responsive styling and accessible UI components |
 | **Build Tooling** | [Vite 7](https://vitejs.dev) | High-speed frontend bundling and hot module replacement |
 | **Data Visualization** | [ApexCharts](https://apexcharts.com) & Vector SVG | Interactive web donut charts and print-optimized vector SVGs |
-| **PDF Generation** | [Spatie Laravel PDF](https://github.com/spatie/laravel-pdf) | Pixel-perfect A4 report generation via headless Chromium |
+| **PDF Generation** | [DOMPDF](https://github.com/dompdf/dompdf) via [Spatie Laravel PDF](https://github.com/spatie/laravel-pdf) | Shared-hosting-safe A4 report generation in pure PHP |
 | **API Authentication** | Custom Token Middleware & Laravel Sanctum | Machine-to-machine hardware token verification |
 
 ---
@@ -150,7 +150,7 @@ Step 1: Report Selection  ──>  Step 2: Period Range  ──>  Step 3: Granul
 - Deduplicated aggregation grouped by unique student external IDs.
 - Tracks total check-ins, sessions, distinct workstations used, and first/last access timestamps.
 - **Embedded Visual Analytics**:
-  - Interactive Course Distribution Donut Chart (ApexCharts on web, vector SVG in PDF).
+  - Interactive Course Distribution Donut Chart (ApexCharts on web, simplified SVG in PDF).
   - Leaderboard Cards for Top 3 Students (by Logins & Usage Time).
   - Leaderboard Cards for Top 3 Courses (by Logins & Usage Time).
 - Instant browser print preview and downloadable timestamped PDF.
@@ -182,7 +182,6 @@ Ensure you have the following installed on your development environment:
 - **Composer** >= 2.5
 - **Node.js** >= 18.x and **npm** or **pnpm**
 - **MySQL** >= 8.0
-- **Google Chrome** or **Chromium** (for headless PDF generation)
 
 ### Installation
 
@@ -226,10 +225,12 @@ Ensure you have the following installed on your development environment:
    DB_USERNAME=root
    DB_PASSWORD=your_password
 
-   # University Student MIS Gateway
-   MIS_URL=http://localhost:5080
-   MIS_KEY=your_optional_api_key
-   MIS_TIMEOUT=3.0
+   # University Student Database / API
+   MIS_API_BASE_URL=http://localhost:5080
+   MIS_API_STUDENT_PATH=/api/students/{cardId}
+   MIS_API_TIMEOUT=3
+   MIS_API_KEY=your_optional_api_key
+   LARAVEL_PDF_DRIVER=dompdf
    ```
 
 ### Database Setup & Migrations

@@ -1,37 +1,51 @@
 <style>
-    html, body {
-        margin: 0;
-        padding: 0;
+    .olh-report-footer {
+        border-collapse: collapse;
+        border-top: 1.5px solid #000;
+        margin-top: 10px;
+        table-layout: fixed;
         width: 100%;
-        box-sizing: border-box;
+        font-family: DejaVu Sans, sans-serif;
     }
-    
-    .footer-content {
-        width: 78%;
-        margin: 0 auto;
-        padding-top: 15px; 
-        border-top: 1.5px solid #000; 
-        display: flex;
-        justify-content: flex-end; 
-        align-items: center;
-        gap: 25px; 
+
+    .olh-footer-page {
+        color: #64748b;
+        font-size: 7px;
+        padding-top: 8px;
+        text-align: left;
+        vertical-align: middle;
+        width: 30%;
     }
-    
-    .qs-logo {
-        height: 55px; 
-        width: auto;
+
+    .olh-footer-logos {
+        padding-top: 8px;
+        text-align: right;
+        vertical-align: middle;
+        width: 70%;
     }
-    
-    .socotec-logo {
-        height: 50px; 
-        width: auto;
+
+    .olh-footer-logos img {
+        margin-left: 18px;
+        vertical-align: middle;
+    }
+
+    .olh-footer-qs {
+        height: 42px;
+    }
+
+    .olh-footer-iso {
+        height: 38px;
     }
 </style>
 
-<div class="footer-content">
-    
-    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('image/qs_rating.png'))) }}" class="qs-logo" alt="QS Stars Rated Good">
-    
-    
-    <img src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('image/socotec.jpg'))) }}" class="socotec-logo" alt="SOCOTEC ISO 9001">
-</div>
+<table class="olh-report-footer">
+    <tr>
+        <td class="olh-footer-page">
+            Page {{ $pageNumber ?? 1 }} of {{ $totalPages ?? 1 }}
+        </td>
+        <td class="olh-footer-logos">
+            <img class="olh-footer-qs" src="data:image/png;base64,{{ base64_encode(file_get_contents(public_path('image/qs_rating.png'))) }}" alt="QS Stars Rated Good">
+            <img class="olh-footer-iso" src="data:image/jpeg;base64,{{ base64_encode(file_get_contents(public_path('image/socotec.jpg'))) }}" alt="SOCOTEC ISO 9001">
+        </td>
+    </tr>
+</table>
