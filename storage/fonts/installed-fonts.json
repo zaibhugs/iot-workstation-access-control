@@ -1,0 +1,8 @@
+{
+    "aptos": {
+        "normal": "Aptos-Regular",
+        "bold": "Aptos-Bold",
+        "italic": "Aptos-Italic",
+        "bold_italic": "Aptos-BoldItalic"
+    }
+}

@@ -8,7 +8,7 @@
         body {
             background: #ffffff;
             color: #1e293b;
-            font-family: DejaVu Sans, sans-serif;
+            font-family: Aptos, DejaVu Sans, sans-serif;
             font-size: 9px;
             margin: 0;
             padding: 0;
@@ -157,13 +157,35 @@
             text-align: center !important;
         }
 
-        .report-note {
-            border-top: 1px solid #e2e8f0;
+        .page-note {
             color: #94a3b8;
-            font-size: 7.5px;
-            line-height: 1.5;
-            margin-top: 10px;
-            padding-top: 8px;
+            font-size: 7px;
+            line-height: 1.35;
+            margin-top: 3px;
+        }
+
+        .page {
+            height: 1074px;
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        .page-header,
+        .page-footer {
+            left: 0;
+            position: absolute;
+            right: 0;
+        }
+
+        .page-header { top: 0; }
+        .page-footer { bottom: 0; }
+        .page-footer .olh-report-footer { margin-top: 0; }
+
+        .page-body {
+            padding-bottom: 72px;
+            padding-left: 12.7mm;
+            padding-right: 12.7mm;
+            padding-top: 130px;
         }
     </style>
 </head>
@@ -178,14 +200,18 @@
     @endphp
 
     @foreach ($pages as $page)
-        @include('admin.reports.AccessLogReport.header', [
-            'pageNumber' => $page['number'],
-            'totalPages' => $page['total'],
-        ])
+        <div class="page">
+            <div class="page-header">
+                @include('admin.reports.AccessLogReport.header', [
+                    'pageNumber' => $page['number'],
+                    'totalPages' => $page['total'],
+                ])
+            </div>
 
-        @if ($page['number'] === 1)
+            <div class="page-body">
+                @if ($page['number'] === 1)
             <div class="report-header">
-                <div class="report-label">OLH Library Management</div>
+                <div class="report-label">Workstation Access Control System</div>
                 <h1 class="report-title">Device Access Control Report</h1>
                 <div class="report-description">
                     Generated access activity report containing student, workstation and event records based on the selected report configuration.
@@ -288,16 +314,15 @@
             </tbody>
         </table>
 
-        @if ($page['number'] === 1)
-            <div class="report-note">
-                This document was generated automatically by the OLH Library Management System. Access records shown reflect the filters and columns selected at the time of generation.
             </div>
-        @endif
 
-        @include('admin.reports.AccessLogReport.footer', [
-            'pageNumber' => $page['number'],
-            'totalPages' => $page['total'],
-        ])
+            <div class="page-footer">
+                @include('admin.reports.AccessLogReport.footer', [
+                    'pageNumber' => $page['number'],
+                    'totalPages' => $page['total'],
+                ])
+            </div>
+        </div>
 
         @if (! $loop->last)
             @pageBreak

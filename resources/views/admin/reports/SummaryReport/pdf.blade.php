@@ -8,7 +8,7 @@
         body {
             background: #ffffff;
             color: #1e293b;
-            font-family: DejaVu Sans, sans-serif;
+            font-family: Aptos, DejaVu Sans, sans-serif;
             font-size: 9px;
             margin: 0;
             padding: 0;
@@ -115,36 +115,52 @@
         }
 
         .donut-cell {
+            padding: 0 0 6px;
             text-align: center;
             vertical-align: middle;
-            width: 108px;
+            width: 100%;
+        }
+
+        .donut-image {
+            height: 120px;
+            width: 120px;
         }
 
         .legend-cell {
-            padding-left: 4px;
+            padding: 0;
             vertical-align: middle;
         }
 
+        .legend-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 3px 5px;
+        }
+
         .legend-row td {
-            font-size: 6.8px;
+            font-size: 7px;
+            line-height: 1.45;
             padding: 2px 0;
-            vertical-align: top;
+            vertical-align: middle;
         }
 
         .legend-dot-col {
-            padding-right: 3px;
-            width: 8px;
+            padding-right: 5px;
+            width: 9px;
         }
 
         .legend-dot {
+            border-radius: 50%;
             display: inline-block;
-            height: 6px;
-            width: 6px;
+            height: 7px;
+            vertical-align: middle;
+            width: 7px;
         }
 
         .legend-course-col {
             color: #334155;
             font-weight: bold;
+            word-wrap: break-word;
         }
 
         .legend-count-col {
@@ -152,17 +168,18 @@
             font-weight: bold;
             text-align: right;
             white-space: nowrap;
+            width: 52px;
         }
 
         .lb-grid {
             border-collapse: separate;
-            border-spacing: 5px;
+            border-spacing: 4px;
         }
 
         .lb-box {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            padding: 5px 6px;
+            padding: 4px 5px;
             vertical-align: top;
             width: 50%;
         }
@@ -172,7 +189,7 @@
             color: #0f172a;
             font-size: 7.2px;
             font-weight: bold;
-            margin-bottom: 4px;
+            margin-bottom: 3px;
             padding-bottom: 3px;
         }
 
@@ -185,13 +202,31 @@
         .lb-item td {
             border-bottom: 1px dotted #e2e8f0;
             font-size: 6.8px;
-            padding: 2px 0;
+            line-height: 1.3;
+            padding: 1px 0;
+            vertical-align: middle;
         }
 
         .rank-badge {
             color: #0f172a;
             font-size: 6.5px;
             font-weight: bold;
+        }
+
+        .lb-rank {
+            width: 10px;
+        }
+
+        .lb-name {
+            width: auto;
+        }
+
+        .lb-course {
+            width: 52%;
+        }
+
+        .lb-value {
+            width: 34px;
         }
 
         .name-cell {
@@ -201,7 +236,7 @@
 
         .val-pill {
             color: #1d4ed8;
-            font-size: 6.2px;
+            font-size: 6px;
             font-weight: bold;
             text-align: right;
             white-space: nowrap;
@@ -246,10 +281,35 @@
         .muted { color: #64748b; }
         .empty { padding: 14px !important; text-align: center; }
 
-        .note {
-            color: #64748b;
-            font-size: 7.5px;
-            margin-top: 10px;
+        .page-note {
+            color: #94a3b8;
+            font-size: 7px;
+            line-height: 1.35;
+            margin-top: 3px;
+        }
+
+        .page {
+            height: 1074px;
+            page-break-inside: avoid;
+            position: relative;
+        }
+
+        .page-header,
+        .page-footer {
+            left: 0;
+            position: absolute;
+            right: 0;
+        }
+
+        .page-header { top: 0; }
+        .page-footer { bottom: 0; }
+        .page-footer .olh-report-footer { margin-top: 0; }
+
+        .page-body {
+            padding-bottom: 72px;
+            padding-left: 12.7mm;
+            padding-right: 12.7mm;
+            padding-top: 130px;
         }
     </style>
 </head>
@@ -257,59 +317,22 @@
     @php
         $pieCounts = $chartCourseCounts ?? [];
         $pieLabels = $chartCourseLabels ?? [];
-        $pieColors = $chartCourseColors ?? ['#1d4ed8', '#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#cbd5e1'];
+        $pieColors = $chartCourseColors ?? ['#2563EB', '#0EA5E9', '#10B981', '#F59E0B', '#8B5CF6', '#94A3B8'];
         $piePercentages = $chartCoursePercentages ?? [];
         $pieTotal = array_sum($pieCounts);
-
-        $size = 104;
-        $cx = 52;
-        $cy = 52;
-        $outerR = 43;
-        $innerR = 26;
-        $svgPaths = [];
-
-        if ($pieTotal > 0) {
-            if (count($pieCounts) === 1) {
-                $c = $pieColors[0] ?? '#3b82f6';
-                $svgPaths[] = "<circle cx='{$cx}' cy='{$cy}' r='{$outerR}' fill='{$c}' />"
-                            . "<circle cx='{$cx}' cy='{$cy}' r='{$innerR}' fill='#ffffff' />";
-            } else {
-                $currentAngle = -M_PI / 2;
-                foreach ($pieCounts as $i => $count) {
-                    if ($count <= 0) continue;
-
-                    $fraction = $count / $pieTotal;
-                    $angleSpan = $fraction * 2 * M_PI;
-                    $endAngle = $currentAngle + $angleSpan;
-                    $color = $pieColors[$i % count($pieColors)] ?? '#3b82f6';
-
-                    $x1 = round($cx + $outerR * cos($currentAngle), 2);
-                    $y1 = round($cy + $outerR * sin($currentAngle), 2);
-                    $x2 = round($cx + $outerR * cos($endAngle), 2);
-                    $y2 = round($cy + $outerR * sin($endAngle), 2);
-                    $x3 = round($cx + $innerR * cos($endAngle), 2);
-                    $y3 = round($cy + $innerR * sin($endAngle), 2);
-                    $x4 = round($cx + $innerR * cos($currentAngle), 2);
-                    $y4 = round($cy + $innerR * sin($currentAngle), 2);
-
-                    $largeArc = $angleSpan > M_PI ? 1 : 0;
-                    $path = "M {$x1} {$y1} A {$outerR} {$outerR} 0 {$largeArc} 1 {$x2} {$y2} "
-                          . "L {$x3} {$y3} A {$innerR} {$innerR} 0 {$largeArc} 0 {$x4} {$y4} Z";
-
-                    $svgPaths[] = "<path d='{$path}' fill='{$color}' stroke='#ffffff' stroke-width='1.2' />";
-                    $currentAngle = $endAngle;
-                }
-            }
-        }
     @endphp
 
     @foreach ($pages as $page)
-        @include('admin.reports.SummaryReport.header', [
-            'pageNumber' => $page['number'],
-            'totalPages' => $page['total'],
-        ])
+        <div class="page">
+            <div class="page-header">
+                @include('admin.reports.SummaryReport.header', [
+                    'pageNumber' => $page['number'],
+                    'totalPages' => $page['total'],
+                ])
+            </div>
 
-        @if ($page['number'] === 1)
+            <div class="page-body">
+                @if ($page['number'] === 1)
             <div class="report-header">
                 <div class="label">Student Summary Report</div>
                 <h1>Workstation Access Summary</h1>
@@ -341,18 +364,17 @@
                         <td class="analytics-col col-left">
                             <div class="section-title">Course Distribution (Overview)</div>
 
-                            @if ($pieTotal > 0)
+                            @if (! empty($donutImage))
                                 <table class="donut-layout">
                                     <tr>
                                         <td class="donut-cell">
-                                            <svg viewBox="0 0 {{ $size }} {{ $size }}" width="{{ $size }}" height="{{ $size }}">
-                                                {!! implode('', $svgPaths) !!}
-                                                <text x="{{ $cx }}" y="{{ $cy - 2 }}" text-anchor="middle" font-size="11" font-weight="bold" fill="#0f172a">{{ number_format($pieTotal) }}</text>
-                                                <text x="{{ $cx }}" y="{{ $cy + 7 }}" text-anchor="middle" font-size="5.5" fill="#64748b">Students</text>
-                                            </svg>
+                                            <img class="donut-image" src="{{ $donutImage }}" alt="Course Distribution Donut Chart">
                                         </td>
+                                    </tr>
+                                    <tr>
                                         <td class="legend-cell">
-                                            <table class="legend-table">
+                                            <div class="legend-box">
+                                                <table class="legend-table">
                                                 @foreach ($pieLabels as $idx => $label)
                                                     @php
                                                         $color = $pieColors[$idx % count($pieColors)] ?? '#3b82f6';
@@ -363,13 +385,14 @@
                                                         <td class="legend-dot-col">
                                                             <span class="legend-dot" style="background-color: {{ $color }};"></span>
                                                         </td>
-                                                        <td class="legend-course-col">{{ $label }}</td>
+                                                        <td class="legend-course-col">{{ \Illuminate\Support\Str::limit($label, 52) }}</td>
                                                         <td class="legend-count-col">
                                                             {{ number_format($count) }} <span class="muted">({{ $pct }}%)</span>
                                                         </td>
                                                     </tr>
                                                 @endforeach
-                                            </table>
+                                                </table>
+                                            </div>
                                         </td>
                                     </tr>
                                 </table>
@@ -386,13 +409,13 @@
                             <table class="lb-grid">
                                 <tr>
                                     <td class="lb-box">
-                                        <div class="lb-title">Top Students <span class="lb-subtitle">· Logins</span></div>
+                                        <div class="lb-title">Top Students <span class="lb-subtitle">· Allowed</span></div>
                                         <table class="lb-list">
                                             @forelse ($topStudentsByLogins ?? [] as $i => $s)
                                                 <tr class="lb-item">
-                                                    <td style="width: 14px;"><span class="rank-badge">#{{ $i + 1 }}</span></td>
-                                                    <td class="name-cell">{{ $s->student_name ?: 'Unknown' }}</td>
-                                                    <td class="val-pill">{{ number_format($s->login_count) }} log</td>
+                                                    <td class="lb-rank"><span class="rank-badge">#{{ $i + 1 }}</span></td>
+                                                    <td class="name-cell lb-name">{{ $s->student_name ?: 'Unknown' }}</td>
+                                                    <td class="val-pill lb-value">{{ number_format($s->login_count) }}</td>
                                                 </tr>
                                             @empty
                                                 <tr class="lb-item"><td colspan="3" style="color: #94a3b8; text-align: center;">No records</td></tr>
@@ -405,9 +428,9 @@
                                         <table class="lb-list">
                                             @forelse ($topStudentsByTime ?? [] as $i => $s)
                                                 <tr class="lb-item">
-                                                    <td style="width: 14px;"><span class="rank-badge">#{{ $i + 1 }}</span></td>
-                                                    <td class="name-cell">{{ $s->student_name ?: 'Unknown' }}</td>
-                                                    <td class="val-pill val-emerald">{{ $s->formatted_time }}</td>
+                                                    <td class="lb-rank"><span class="rank-badge">#{{ $i + 1 }}</span></td>
+                                                    <td class="name-cell lb-name">{{ $s->student_name ?: 'Unknown' }}</td>
+                                                    <td class="val-pill lb-value val-emerald">{{ $s->formatted_time }}</td>
                                                 </tr>
                                             @empty
                                                 <tr class="lb-item"><td colspan="3" style="color: #94a3b8; text-align: center;">No records</td></tr>
@@ -417,13 +440,13 @@
                                 </tr>
                                 <tr>
                                     <td class="lb-box">
-                                        <div class="lb-title">Top Courses <span class="lb-subtitle">· Logins</span></div>
+                                        <div class="lb-title">Top Courses <span class="lb-subtitle">· Allowed</span></div>
                                         <table class="lb-list">
                                             @forelse ($topCoursesByLogins ?? [] as $i => $c)
                                                 <tr class="lb-item">
-                                                    <td style="width: 14px;"><span class="rank-badge">#{{ $i + 1 }}</span></td>
-                                                    <td class="name-cell">{{ $c->course }}</td>
-                                                    <td class="val-pill">{{ number_format($c->login_count) }} log</td>
+                                                    <td class="lb-rank"><span class="rank-badge">#{{ $i + 1 }}</span></td>
+                                                    <td class="name-cell lb-name lb-course">{{ \Illuminate\Support\Str::limit($c->course, 28) }}</td>
+                                                    <td class="val-pill lb-value">{{ number_format($c->login_count) }}</td>
                                                 </tr>
                                             @empty
                                                 <tr class="lb-item"><td colspan="3" style="color: #94a3b8; text-align: center;">No records</td></tr>
@@ -436,9 +459,9 @@
                                         <table class="lb-list">
                                             @forelse ($topCoursesByTime ?? [] as $i => $c)
                                                 <tr class="lb-item">
-                                                    <td style="width: 14px;"><span class="rank-badge">#{{ $i + 1 }}</span></td>
-                                                    <td class="name-cell">{{ $c->course }}</td>
-                                                    <td class="val-pill val-purple">{{ $c->formatted_time }}</td>
+                                                    <td class="lb-rank"><span class="rank-badge">#{{ $i + 1 }}</span></td>
+                                                    <td class="name-cell lb-name lb-course">{{ \Illuminate\Support\Str::limit($c->course, 28) }}</td>
+                                                    <td class="val-pill lb-value val-purple">{{ $c->formatted_time }}</td>
                                                 </tr>
                                             @empty
                                                 <tr class="lb-item"><td colspan="3" style="color: #94a3b8; text-align: center;">No records</td></tr>
@@ -499,16 +522,15 @@
             </tbody>
         </table>
 
-        @if ($page['number'] === 1)
-            <div class="note">
-                This document was generated automatically by the Workstation Access Control System.
             </div>
-        @endif
 
-        @include('admin.reports.SummaryReport.footer', [
-            'pageNumber' => $page['number'],
-            'totalPages' => $page['total'],
-        ])
+            <div class="page-footer">
+                @include('admin.reports.SummaryReport.footer', [
+                    'pageNumber' => $page['number'],
+                    'totalPages' => $page['total'],
+                ])
+            </div>
+        </div>
 
         @if (! $loop->last)
             @pageBreak

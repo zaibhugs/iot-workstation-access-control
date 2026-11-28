@@ -1,2 +1,5 @@
 *
 !.gitignore
+!*.ttf
+!*.ufm
+!installed-fonts.json

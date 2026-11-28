@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\PcAccessLogs;
+use App\Services\ReportCharts;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -309,7 +310,7 @@ class ReportsController extends Controller
         $pages = $this->paginateReportRows(
             $logs,
             16,
-            20
+            19
         );
 
         return Pdf::view(
@@ -338,15 +339,16 @@ class ReportsController extends Controller
             ]
         )
             ->margins(
-                14,
-                12,
-                14,
-                12,
+                6.35,
+                6.35,
+                6.35,
+                6.35,
                 Unit::Millimeter
             )
             ->format(
                 Format::A4
-            );
+            )
+            ->portrait();
     }
 
     /*
@@ -766,8 +768,9 @@ class ReportsController extends Controller
         array $filters
     ) {
 
-        $periodLabel =
-            Carbon::parse(
+        $periodLabel = ($filters['all_time'] ?? false)
+            ? 'All Time'
+            : Carbon::parse(
                 $filters['date_from']
             )->format(
                 'M d, Y'
@@ -781,10 +784,17 @@ class ReportsController extends Controller
 
         $analytics = $this->studentSummaryAnalytics($filters, $students);
 
+        $donutImage = app(ReportCharts::class)->donut(
+            $analytics['chartCourseCounts'],
+            $analytics['chartCourseLabels'],
+            $analytics['chartCourseColors'],
+            (int) $analytics['totalCourseStudents']
+        );
+
         $pages = $this->paginateReportRows(
             $students,
-            12,
-            22
+            8,
+            16
         );
 
         return Pdf::view(
@@ -798,19 +808,22 @@ class ReportsController extends Controller
 
                 'periodLabel' => $periodLabel,
 
+                'donutImage' => $donutImage,
+
                 'generatedAt' => now(),
             ], $analytics)
         )
             ->margins(
-                14,
-                12,
-                14,
-                12,
+                6.35,
+                6.35,
+                6.35,
+                6.35,
                 Unit::Millimeter
             )
             ->format(
                 Format::A4
-            );
+            )
+            ->portrait();
     }
 
     /*
@@ -842,12 +855,36 @@ class ReportsController extends Controller
         $pages = [];
         $offset = 0;
 
-        while ($offset < $rows->count()) {
-
-            $size = $pages === [] ? $firstPageSize : $pageSize;
+        if ($firstPageSize > 0) {
 
             $slice = $rows
-                ->slice($offset, $size)
+                ->slice(0, $firstPageSize)
+                ->values();
+
+            $pages[] = [
+                'number' => 1,
+                'rows' => $slice
+                    ->map(fn ($row, $index) => [
+                        'data' => $row,
+                        'number' => $offset + $index + 1,
+                    ])
+                    ->all(),
+            ];
+
+            $offset += $slice->count();
+
+        } else {
+
+            $pages[] = [
+                'number' => 1,
+                'rows' => [],
+            ];
+        }
+
+        while ($offset < $rows->count()) {
+
+            $slice = $rows
+                ->slice($offset, $pageSize)
                 ->values();
 
             $pages[] = [
@@ -1157,7 +1194,7 @@ class ReportsController extends Controller
         $chartCourseCounts = [];
         $chartCoursePercentages = [];
         $chartCourseColors = [
-            '#1D4ED8', '#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#CBD5E1',
+            '#2563EB', '#0EA5E9', '#10B981', '#F59E0B', '#8B5CF6', '#94A3B8',
         ];
 
         if ($totalCourseStudents > 0) {

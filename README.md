@@ -64,8 +64,13 @@ An enterprise-grade IoT access control, workstation monitoring, and analytics pl
   - **Top 3 Courses by Accumulated Usage Time**: Quantifies academic computer lab utilization.
 - **Institutional PDF Generation**:
   - Pure-PHP DOMPDF rendering powered by Spatie Laravel PDF; no Node.js, Chrome, or Docker required on shared hosting.
-  - Official university header (Southern Leyte State University / Bagong Pilipinas) and ISO 9001 / QS-Stars rated footer repeated on every PDF page.
-  - Manually paginated report pages with `Page X of Y` counters, inline SVG donut graphs, and color-coded leaderboard summaries.
+  - A4 portrait pages with bundled Aptos regular, bold, italic, and bold-italic fonts registered directly in DOMPDF.
+  - Old Browsershot-style institutional header: centered grouped SLSU and Bagong Pilipinas logos with the core-values rule tucked tightly beneath them.
+  - Word-style fixed header/footer anchored to every A4 page, with QS-Stars / ISO 9001 footer logos, `Page X of Y` counters, and the generated-by note inside the footer.
+  - `0.25"` anchored header/footer with about `0.8"` side rules and `0.75"` left/right body margins.
+  - Reports identify the system as the Workstation Access Control System.
+  - Manually paginated report pages with the original clean table-based design.
+  - Two-column analytics panel: a larger centered server-rendered PNG course-distribution donut with its compact legend directly beneath it, plus a 2×2 leaderboard grid with narrow rank/value columns and a wide name column. The donut and legend share one varied color palette across both the PDF and reports page.
 
 ---
 
@@ -114,8 +119,8 @@ graph TD
 | **Database** | [MySQL 8.x](https://mysql.com) | Relational storage for telemetry, access logs, sessions, and devices |
 | **Frontend UI** | [Tailwind CSS v4](https://tailwindcss.com) + [Flowbite](https://flowbite.com) | Modern utility-first responsive styling and accessible UI components |
 | **Build Tooling** | [Vite 7](https://vitejs.dev) | High-speed frontend bundling and hot module replacement |
-| **Data Visualization** | [ApexCharts](https://apexcharts.com) & Vector SVG | Interactive web donut charts and print-optimized vector SVGs |
-| **PDF Generation** | [DOMPDF](https://github.com/dompdf/dompdf) via [Spatie Laravel PDF](https://github.com/spatie/laravel-pdf) | Shared-hosting-safe A4 report generation in pure PHP |
+| **Data Visualization** | [ApexCharts](https://apexcharts.com) & server-rendered GD graphics | Interactive web charts and PDF-safe donut/bar figures |
+| **PDF Generation** | [DOMPDF](https://github.com/dompdf/dompdf) via [Spatie Laravel PDF](https://github.com/spatie/laravel-pdf) | Shared-hosting-safe A4 portrait reports in pure PHP with bundled Aptos fonts |
 | **API Authentication** | Custom Token Middleware & Laravel Sanctum | Machine-to-machine hardware token verification |
 
 ---
@@ -150,7 +155,7 @@ Step 1: Report Selection  ──>  Step 2: Period Range  ──>  Step 3: Granul
 - Deduplicated aggregation grouped by unique student external IDs.
 - Tracks total check-ins, sessions, distinct workstations used, and first/last access timestamps.
 - **Embedded Visual Analytics**:
-  - Interactive Course Distribution Donut Chart (ApexCharts on web, simplified SVG in PDF).
+  - Course Distribution Donut Chart (ApexCharts on web, generated PNG figure in PDF).
   - Leaderboard Cards for Top 3 Students (by Logins & Usage Time).
   - Leaderboard Cards for Top 3 Courses (by Logins & Usage Time).
 - Instant browser print preview and downloadable timestamped PDF.
@@ -337,7 +342,7 @@ iot-workstation-access-control/
 │       │       ├── index.blade.php         # Wizard coordinator
 │       │       ├── partials/               # Stepper, filters, student summary
 │       │       ├── AccessLogReport/        # Access log PDF view & headers
-│       │       └── SummaryReport/          # Student summary PDF & SVG chart
+│       │       └── SummaryReport/          # Student summary PDF & generated PNG chart
 │       └── layout/
 │           └── app.blade.php               # Master layout with Tailwind & Flowbite
 ├── routes/

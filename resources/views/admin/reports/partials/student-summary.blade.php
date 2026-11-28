@@ -69,7 +69,7 @@
                     <div class="max-h-48 space-y-1.5 overflow-y-auto pr-1 text-xs">
                         @foreach ($chartCourseLabels as $idx => $label)
                             @php
-                                $color = $chartCourseColors[$idx % count($chartCourseColors)] ?? '#3B82F6';
+                                $color = $chartCourseColors[$idx % count($chartCourseColors)] ?? '#2563EB';
                                 $count = $chartCourseCounts[$idx] ?? 0;
                                 $pct = $chartCoursePercentages[$idx] ?? 0;
                             @endphp
